@@ -12,24 +12,13 @@ import {
 } from "../Constants/ProductConstants";
 import { logout } from "./UserActions";
 
-// Product list
-export const listProduct =
-  () =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: PRODUCT_LIST_REQUEST });
-      const { data } = await axios.get(`https://localhost:7296/api/Product`);
-      dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
-    } catch (error) {
-      dispatch({
-        type: PRODUCT_LIST_FAIL,
-        payload:
-          error.response && error.response.data.message
-            ? error.response.data.message
-            : error.message,
-      });
-    }
-  };
+export class ProductDataService{
+  // Product list
+    async listProduct() {
+      return await axios.get("https://localhost:7296/api/Product");
+   };
+
+}
 
 // Single product
 export const listProductDetails = (id) => async (dispatch) => {

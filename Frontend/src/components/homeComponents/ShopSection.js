@@ -9,6 +9,7 @@ import Loading from "../LoadingError/Loading";
 import Pagination from "./pagination";
 import Rating from "./Rating";
 import "./ShopSection.css";
+import { ProductDataService } from './../../redux/Actions/ProductActions';
 
 const ShopSection = () => {
   const dispatch = useDispatch();
@@ -30,13 +31,20 @@ const ShopSection = () => {
   const [selectedSort, setSelectedSort] = useState();
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(9);
+  const [listOfProducts, setProducts] = useState();
 
+  const getProductList = () => {
+    ProductDataService.listProduct.then((res) => {
+      setProducts(res.data);
+    }).catch((error) => {
+      console.error(error);
+    })
+  }
   useEffect(() => {
-    dispatch(listProduct());
+    getProductList();
     dispatch(lisCategories());
     dispatch({ type: ORDER_DETAILS_RESET });
   }, [dispatch]);
-
   // Search product
   const searchProducts = products?.filter((product) => {
     if (searchProduct === "") {
@@ -165,7 +173,7 @@ const ShopSection = () => {
                   <Message variant="alert-danger">{error}</Message>
                 ) : (
                   <>
-                    {currentProducts.map((product) => (
+                    {listOfProducts.map((product) => (
                       <div
                         className="shop col-lg-4 col-md-6 col-sm-6"
                         key={product._id}
