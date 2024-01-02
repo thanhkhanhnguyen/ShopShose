@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useHistory } from 'react-router-dom';
 import {
   USER_LIST_FAIL,
   USER_LIST_REQUEST,
@@ -28,23 +29,24 @@ export const login = (email, password) => async (dispatch) => {
         "Content-Type": "application/json",
       },
     };
-
+    const history = useHistory();
     const { data } = await axios.post(
-      `https://localhost:7296/api/Auth/login`,
+      "https://localhost:7296/api/Auth/login",
       { email, password },
       config
     );
-
-    if (!data.isAdmin === true) {
+    
+    if (!data.metadata.role.includes("Admin")) {
       toast.error("You are not Admin", ToastObjects);
       dispatch({
         type: USER_LOGIN_FAIL,
       });
     } else {
-      dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
+      dispatch({ type: USER_LOGIN_SUCCESS, payload: data.metadata });
     }
 
-    localStorage.setItem("userInfo", JSON.stringify(data));
+    localStorage.setItem("userInfo", JSON.stringify(data.metadata));
+    history.push("/");
   } catch (error) {
     const message =
       error.response && error.response.data.message

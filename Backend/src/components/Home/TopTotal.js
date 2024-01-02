@@ -1,14 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
 const TopTotal = (props) => {
   const { orders, products } = props;
-  let totalSale = 0;
   if (orders) {
     orders.map((order) =>
       order.isPaid === true ? (totalSale = totalSale + order.totalPrice) : null
     );
   }
-
+  const [totalSale, setTotalSale] = useState("");
+  const [totalProduct, setTotalProduct] = useState("");
+  const [totalOrder, setTotalOrder] = useState("");
+  const userLogin = JSON.parse(localStorage.getItem("userInfo"));
+  console.log('Bearer ' + String(userLogin.metadata.accessToken));
+  const config = {
+    headers: {
+      "Authorization": 'Bearer ' + String(userLogin.metadata.accessToken),
+    },
+  };
+  axios.get(
+    "https://localhost:7296/api/Admin/total-sale",
+    config
+  ).then(response => {
+    setTotalSale(response.data.metadata);
+  }).catch(error => {
+    console.error(error)
+  });
+  axios.get(
+    "https://localhost:7296/api/Admin/total-product",
+    config
+  ).then(response => {
+    setTotalProduct(response.data.metadata);
+  }).catch(error => {
+    console.error(error)
+  });
+  axios.get(
+    "https://localhost:7296/api/Admin/total-order",
+    config
+  ).then(response => {
+    setTotalOrder(response.data.metadata);
+  }).catch(error => {
+    console.error(error)
+  });
   return (
     <div className="row">
       <div className="col-lg-4">
@@ -19,7 +52,7 @@ const TopTotal = (props) => {
             </span>
             <div className="text">
               <h6 className="mb-1">Total Sales</h6>{" "}
-              <span>${totalSale.toFixed(0)}</span>
+              <span>{ totalSale }</span>
             </div>
           </article>
         </div>
@@ -32,7 +65,7 @@ const TopTotal = (props) => {
             </span>
             <div className="text">
               <h6 className="mb-1">Total Orders</h6>
-              {orders ? <span>{orders.length}</span> : <span>0</span>}
+              <span>{totalOrder || 0}</span>
             </div>
           </article>
         </div>
@@ -45,7 +78,7 @@ const TopTotal = (props) => {
             </span>
             <div className="text">
               <h6 className="mb-1">Total Products</h6>
-              {products ? <span>{products.length}</span> : <span>0</span>}
+              {totalProduct ? <span>{totalProduct}</span> : <span>0</span>}
             </div>
           </article>
         </div>

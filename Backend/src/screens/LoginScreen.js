@@ -13,21 +13,20 @@ const Login = ({ history, location }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const dispatch = useDispatch();
   const redirect = location.search ? location.search.split("=")[1] : "/";
 
   const userLogin = useSelector((state) => state.userLogin);
   const { error, loading, userInfo } = userLogin;
-
+  console.log(userInfo);
   useEffect(() => {
     if (userInfo) {
       history.push("/");
     }
-  }, [userInfo, history, redirect]);
+  }, []);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    dispatch(login(email, password));
+    login(email, password);
   };
   return (
     <>
