@@ -15,12 +15,14 @@ import ProfileScreen from "./screens/ProfileScreen";
 import Register from "./screens/Register";
 import ShippingScreen from "./screens/ShippingScreen";
 import SingleProduct from "./screens/SingleProduct";
-
+import Log from"./screens/Log";
 const App = () => {
   return (
     <Router>
       <Switch>
+      
         <Route path="/" component={HomeScreen} exact />
+        <Route path="/log" component={Log} />
         <Route path="/products/:id" component={SingleProduct} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
