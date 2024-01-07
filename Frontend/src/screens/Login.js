@@ -7,7 +7,7 @@ import Loading from "./../components/LoadingError/Loading";
 import { login } from "./../redux/Actions/UserActions";
 import axios from "axios";
 
- const Login = ({ location, history }) => {
+const Login = ({ location, history }) => {
   window.scrollTo(0, 0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,27 +17,26 @@ import axios from "axios";
 
   const userLogin = useSelector((state) => state.userLogin);
   const { error, loading, userInfo } = userLogin;
-  const testLogin=async()=>{
-    const response1=await axios.post(
-      "http://localhost:5134/api/Auth/login",
-      {  email: "thanh123@gmail.com",
-         password: "Thanh123@"}
-    )
-    console.log(response1)
-  }
-  
-  
-  useEffect(() => {
-   
-   testLogin();
-  },[])
+  // const testLogin=async()=>{
+  //   const response1=await axios.post(
+  //     "http://localhost:5134/api/Auth/login",
+  //     {  email: "thanh123@gmail.com",
+  //        password: "Thanh123@"}
+  //   )
+  //   console.log(response1)
+  // }
+
+  // useEffect(() => {
+
+  //  testLogin();
+  // },[])
 
   useEffect(() => {
     if (userInfo) {
       history.push(redirect);
     }
   }, [userInfo, history, redirect]);
-  
+
   const submitHandler = (e) => {
     e.preventDefault();
     dispatch(login(email, password));
@@ -77,4 +76,4 @@ import axios from "axios";
     </>
   );
 };
-export default Login
+export default Login;

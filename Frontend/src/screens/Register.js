@@ -11,6 +11,7 @@ const Register = ({ location, history }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
 
   const dispatch = useDispatch();
   const redirect = location.search ? location.search.split("="[1]) : "/";
@@ -26,7 +27,7 @@ const Register = ({ location, history }) => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    dispatch(register(name, email, password));
+    dispatch(register(name, email, password, phone));
   };
   return (
     <>
@@ -55,6 +56,12 @@ const Register = ({ location, history }) => {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
 
           <button type="submit">Register</button>

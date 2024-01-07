@@ -58,7 +58,8 @@ export const logout = () => (dispatch) => {
 };
 
 // Register
-export const register = (name, email, password) => async (dispatch) => {
+export const register = (name, email, password, phone) => async (dispatch) => {
+  console.log({ name, email, password, phone });
   try {
     dispatch({ type: USER_REGISTER_REQUEST });
 
@@ -68,9 +69,15 @@ export const register = (name, email, password) => async (dispatch) => {
       },
     };
 
+    // const { data } = await axios.post(
+    //   `/api/users`,
+    //   { name, email, password },
+    //   config
+    // );
+
     const { data } = await axios.post(
-      `/api/users`,
-      { name, email, password },
+      `http://localhost:5134/api/Auth/register`,
+      { fullName: name, email, password, phone, address: "string" },
       config
     );
     dispatch({ type: USER_REGISTER_SUCCESS, payload: data });
@@ -103,7 +110,10 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
     };
     //https://localhost:7296/api/Auth/login
     //const { data } = await axios.get(`/api/users/${id}`, config);
-    const { data } = await axios.get(`https://localhost:7296/api/User/${id}`, config);
+    const { data } = await axios.get(
+      `https://localhost:7296/api/User/${id}`,
+      config
+    );
     dispatch({ type: USER_DETAILS_SUCCESS, payload: data });
   } catch (error) {
     const message =
@@ -136,7 +146,11 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.put(`https://localhost:7296/api/User/profile`, user, config);
+    const { data } = await axios.put(
+      `https://localhost:7296/api/User/profile`,
+      user,
+      config
+    );
     dispatch({ type: USER_UPDATE_PROFILE_SUCCESS, payload: data });
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
 

@@ -12,19 +12,20 @@ import {
 } from "../Constants/ProductConstants";
 import { logout } from "./UserActions";
 
-export class ProductDataService{
+export class ProductDataService {
   // Product list
-    async listProduct() {
-      return await axios.get("https://localhost:7296/api/Product");
-   };
-
+  async listProduct() {
+    // return await axios.get("https://localhost:7296/api/Product");
+    return await axios.get("http://localhost:5134/api/Product");
+  }
 }
 
 // Single product
 export const listProductDetails = (id) => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_DETAIL_REQUEST });
-    const { data } = await axios.get(`https://localhost:7296/api/Product/${id}`);
+    const { data } = await axios.get(`http://localhost:5134/${id}`);
+    console.log(data);
     dispatch({ type: PRODUCT_DETAIL_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -47,15 +48,23 @@ export const createProductReview =
         userLogin: { userInfo },
       } = getState();
 
+      // console.log("user info", userInfo);
+
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo.metadata.accessToken}`,
         },
       };
 
-     //await axios.post(`/api/products/${productId}/review`, review, config);
-      await axios.post(`https://localhost:7296/api/Product/${productId}`, review, config);
+      console.log(userInfo.metadata.accessToken);
+      //await axios.post(`/api/products/${productId}/review`, review, config);
+      await axios.post(
+        // `https://localhost:7296/api/Product/${productId}`,
+        `http://localhost:5134/api/Comment`,
+        review,
+        config
+      );
       dispatch({ type: PRODUCT_CREATE_REVIEW_SUCCESS });
     } catch (error) {
       const message =

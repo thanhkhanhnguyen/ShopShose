@@ -13,6 +13,7 @@ import Header from "./../components/Header";
 import Message from "./../components/LoadingError/Error";
 import Toast from "./../components/LoadingError/Toast";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const ToastObjects = {
   pauseOnFocusLoss: false,
@@ -21,11 +22,31 @@ const ToastObjects = {
   autoClose: 3000,
 };
 
+function getCurrentDateFormatted() {
+  const currentDate = new Date();
+
+  const day = currentDate.getDate();
+  const month = currentDate.getMonth() + 1; // Tháng bắt đầu từ 0
+  const year = currentDate.getFullYear() % 100; // Lấy 2 chữ số cuối cùng của năm
+
+  // Đảm bảo rằng ngày và tháng có dạng 01, 02, ..., 09 khi cần thiết
+  const formattedDay = day < 10 ? `0${day}` : day;
+  const formattedMonth = month < 10 ? `0${month}` : month;
+
+  // Định dạng cuối cùng: dd/mm/yy
+  const formattedDate = `${formattedDay}/${formattedMonth}/${year}`;
+
+  return formattedDate;
+}
+
 const SingleProduct = ({ history, match }) => {
   const [qty, setQty] = useState(1);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const productId = match.params.id;
+
+  const [inQuantity, setInQuantity] = useState(1);
+  // console.log("pid", productId);
   const dispatch = useDispatch();
 
   const productDetails = useSelector((state) => state.productDetails);
@@ -40,6 +61,43 @@ const SingleProduct = ({ history, match }) => {
     error: errorCreateReview,
     success: successCreateReview,
   } = productReviewCreate;
+
+  const [cart, setCart] = useState([]);
+
+  const [reviews, setReviews] = useState([]);
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    dispatch(
+      createProductReview(productId, {
+        productId: productId,
+        rating,
+        content: comment,
+      })
+    );
+  };
+
+  //get review
+  const getReviews = async () => {
+    const response = await axios.get(
+      `http://localhost:5134/api/Comment/product/${productId}`
+    );
+    // console.log(response?.data);
+    setReviews(response?.data || []);
+  };
+
+  useEffect(() => {
+    getReviews();
+  }, [productId, submitHandler]);
+
+  // useEffect(() => {
+  //   const fetchDT = async () => {
+  //     const rs = await axios.get(`http://localhost:5134/1`);
+  //     console.log("fetchData", rs);
+  //   };
+
+  //   fetchDT();
+  // }, []);
 
   useEffect(() => {
     if (successCreateReview) {
@@ -56,17 +114,58 @@ const SingleProduct = ({ history, match }) => {
     history.push(`/cart/${productId}?qty=${qty}`);
   };
 
-  const submitHandler = (e) => {
-    e.preventDefault();
-    dispatch(
-      createProductReview(productId, {
-        rating,
-        comment,
-      })
-    );
+  // //handle add to cart into session storage
+  // const addToCart = (item) => {
+  //   const { id, name, price } = item;
+  //   const updatedCart = {
+  //     id,
+  //     name,
+  //     price,
+  //     inQuantity,
+  //   };
+  //   setCart(updatedCart);
+  //   sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+  // };
+
+  // Assuming `cart` is an array of items in the state
+  const addToCart = (item) => {
+    const { id, name, price } = item;
+
+    // Retrieve the current cart from sessionStorage
+    const existingCart = JSON.parse(sessionStorage.getItem("cart")) || [];
+
+    // Check if the product with the same ID already exists in the cart
+    const existingProduct = existingCart.find((product) => product.id === id);
+
+    if (existingProduct) {
+      // If the product exists, update the quantity
+      existingProduct.inQuantity += inQuantity * 1;
+    } else {
+      // If the product doesn't exist, add a new item to the cart
+      const newProduct = {
+        id,
+        name,
+        price,
+        inQuantity: inQuantity * 1,
+      };
+      existingCart.push(newProduct);
+    }
+
+    // Update the local state and sessionStorage with the modified cart
+    setCart(existingCart);
+    sessionStorage.setItem("cart", JSON.stringify(existingCart));
   };
 
-  console.log(product.reviews);
+  // const submitHandler = (e) => {
+  //   e.preventDefault();
+  //   dispatch(
+  //     createProductReview(productId, {
+
+  //       rating,
+  //       comment,
+  //     })
+  //   );
+  // };
 
   return (
     <>
@@ -82,7 +181,7 @@ const SingleProduct = ({ history, match }) => {
             <div className="row">
               <div className="col-md-6">
                 <div className="single-image" style={{ width: "100%" }}>
-                  <img src={product.image?.url} alt={product.name} />
+                  <img src={product?.image} alt={product.name} />
                 </div>
               </div>
               <div className="col-md-6">
@@ -106,7 +205,7 @@ const SingleProduct = ({ history, match }) => {
                     </div>
                     <div className="flex-box d-flex justify-content-between align-items-center">
                       <h6>Status</h6>
-                      {product.countInStock > 0 ? (
+                      {product.quantity > 0 ? (
                         <span>In Stock</span>
                       ) : (
                         <span>Unavailable</span>
@@ -114,16 +213,17 @@ const SingleProduct = ({ history, match }) => {
                     </div>
                     <div className="flex-box d-flex justify-content-between align-items-center">
                       <h6>Reviews</h6>
+
                       <Rating
                         value={product.rating}
                         text={`${product.numReviews} reviews`}
                       />
                     </div>
-                    {product.countInStock > 0 ? (
+                    {product.quantity > 0 ? (
                       <>
                         <div className="flex-box d-flex justify-content-between align-items-center">
                           <h6>Quantity</h6>
-                          <select
+                          {/* <select
                             value={qty}
                             onChange={(e) => setQty(e.target.value)}
                           >
@@ -134,10 +234,17 @@ const SingleProduct = ({ history, match }) => {
                                 </option>
                               )
                             )}
-                          </select>
+                          </select> */}
+                          <input
+                            type="number"
+                            name="in-quantity"
+                            id="in-quantity"
+                            value={inQuantity}
+                            onChange={(e) => setInQuantity(e.target.value)}
+                          />
                         </div>
                         <button
-                          onClick={AddToCartHandle}
+                          onClick={() => addToCart(product)}
                           className="round-black-btn"
                         >
                           Add To Cart
@@ -153,7 +260,7 @@ const SingleProduct = ({ history, match }) => {
             <div className="row my-5">
               <div className="col-md-6">
                 <h6 className="mb-3">REVIEWS</h6>
-                {product.reviews.length === 0 && (
+                {/* {product.description.length === 0 && (
                   <Message variant={"alert-info mt-3"}>No Reviews</Message>
                 )}
                 {product.reviews.map((review) => (
@@ -168,8 +275,29 @@ const SingleProduct = ({ history, match }) => {
                       {review.comment}
                     </div>
                   </div>
-                ))}
+                ))} */}
+
+                {false && (
+                  <Message variant={"alert-info mt-3"}>No Reviews</Message>
+                )}
+
+                <div
+                  style={{
+                    height: 500,
+                    overflowY: "scroll",
+                  }}
+                >
+                  {reviews?.map((rv) => (
+                    <div className="mb-5 mb-md-3 bg-light p-3 shadow-sm rounded">
+                      <strong>{rv?.email}</strong>
+                      <Rating value={rv?.rating * 1} />
+                      <span>{getCurrentDateFormatted()}</span>
+                      <div className="alert alert-info mt-3">{rv?.content}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
+
               <div className="col-md-6">
                 <h6>WRITE A CUSTOMER REVIEW</h6>
                 <div className="my-4">
