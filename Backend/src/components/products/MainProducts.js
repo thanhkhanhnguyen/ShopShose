@@ -11,7 +11,7 @@ const MainProducts = () => {
   const dispatch = useDispatch();
 
   const productList = useSelector((state) => state.productList);
-  const { loading, error, products } = productList;
+  const { products } = productList;
 
   const productDelete = useSelector((state) => state.productDelete);
   const { error: errorDelete, success: successDelete } = productDelete;
@@ -34,7 +34,6 @@ const MainProducts = () => {
 
   useEffect(() => {
     dispatch(lisProducts());
-    dispatch(lisCategories());
   }, [dispatch, successDelete, successDeleteImage]);
 
   // Search product
@@ -113,24 +112,18 @@ const MainProducts = () => {
               />
             </div>
             <div className="col-lg-2 col-6 col-md-3">
-              {loadingList ? (
-                <Loading />
-              ) : errorList ? (
-                <Message variant="alert-danger">{errorList}</Message>
-              ) : (
                 <select
                   name="category"
                   className="form-select"
                   onChange={handleCategoryChange}
                 >
                   <option value="">Select a category</option>
-                  {categories.map((category) => (
+                  {categories && categories.map((category) => (
                     <option value={category._id} key={category._id}>
                       {category.name}
                     </option>
                   ))}
                 </select>
-              )}
             </div>
             <div className="col-lg-2 col-6 col-md-3">
               <select
@@ -156,11 +149,6 @@ const MainProducts = () => {
           {errorDeleteImage && (
             <Message variant="alert-danger">{errorDeleteImage}</Message>
           )}
-          {loading ? (
-            <Loading />
-          ) : error ? (
-            <Message variant="alert-danger">{error}</Message>
-          ) : (
             <div className="row">
               {/* Products */}
               {sortList.length ? (
@@ -175,7 +163,6 @@ const MainProducts = () => {
                 </div>
               )}
             </div>
-          )}
         </div>
       </div>
     </section>

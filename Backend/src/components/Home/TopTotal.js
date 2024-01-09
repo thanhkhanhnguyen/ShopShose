@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const TopTotal = (props) => {
-  const { orders, products } = props;
+  const { orders, products, config } = props;
   if (orders) {
     orders.map((order) =>
       order.isPaid === true ? (totalSale = totalSale + order.totalPrice) : null
@@ -11,13 +11,6 @@ const TopTotal = (props) => {
   const [totalSale, setTotalSale] = useState("");
   const [totalProduct, setTotalProduct] = useState("");
   const [totalOrder, setTotalOrder] = useState("");
-  const userLogin = JSON.parse(localStorage.getItem("userInfo"));
-  console.log('Bearer ' + String(userLogin.metadata.accessToken));
-  const config = {
-    headers: {
-      "Authorization": 'Bearer ' + String(userLogin.metadata.accessToken),
-    },
-  };
   axios.get(
     "https://localhost:7296/api/Admin/total-sale",
     config

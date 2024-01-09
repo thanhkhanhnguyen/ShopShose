@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useHistory } from 'react-router-dom';
 import {
   USER_LIST_FAIL,
   USER_LIST_REQUEST,
@@ -13,23 +12,14 @@ import {
 import { toast } from "react-toastify";
 
 // Login
-export const login = (email, password) => async (dispatch) => {
-  const ToastObjects = {
-    pauseOnFocusLoss: false,
-    draggable: false,
-    pauseOnHover: false,
-    autoClose: 3000,
-  };
-
+export const login = async (email, password) => {
   try {
-    dispatch({ type: USER_LOGIN_REQUEST });
 
     const config = {
       headers: {
         "Content-Type": "application/json",
       },
     };
-    const history = useHistory();
     const { data } = await axios.post(
       "https://localhost:7296/api/Auth/login",
       { email, password },
@@ -37,31 +27,19 @@ export const login = (email, password) => async (dispatch) => {
     );
     
     if (!data.metadata.role.includes("Admin")) {
-      toast.error("You are not Admin", ToastObjects);
-      dispatch({
-        type: USER_LOGIN_FAIL,
-      });
-    } else {
-      dispatch({ type: USER_LOGIN_SUCCESS, payload: data.metadata });
+      return alert("You are not Admin");
     }
-
     localStorage.setItem("userInfo", JSON.stringify(data.metadata));
-    history.push("/");
+    
+    return true;
   } catch (error) {
     const message =
       error.response && error.response.data.message
         ? error.response.data.message
         : error.message;
     if (message === "Not authorized, token failed") {
-      dispatch(logout());
+      logout();
     }
-    dispatch({
-      type: USER_LOGIN_FAIL,
-      payload:
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message,
-    });
   }
 };
 

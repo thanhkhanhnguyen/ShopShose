@@ -6,8 +6,29 @@ import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 
 const CategoriesTable = (props) => {
-  const { loading, error, categories, errorDelete, isEdit } = props;
-
+  const { loading, error, errorDelete, isEdit } = props;
+  const categories = [
+    {
+      id: 1,
+      name: 'Category 1'
+    },
+    {
+      id: 2,
+      name: 'Category 2'
+    },
+    {
+      id: 3,
+      name: 'Category 3'
+    },
+    {
+      id: 4,
+      name: 'Category 4'
+    },
+    {
+      id: 5,
+      name: 'Category 5'
+    },
+  ]
   const dispatch = useDispatch();
 
   const deleteHandler = (id) => {
@@ -56,12 +77,11 @@ const CategoriesTable = (props) => {
         ) : (
           <tbody>
             {categories.map((category) => (
-              <tr key={category._id}>
-                <td>{category._id}</td>
+              <tr key={category.id}>
+                <td>{category.id}</td>
                 <td>
                   <b>{category.name}</b>
                 </td>
-                <td>{category.description}</td>
                 {isEdit ? (
                   ""
                 ) : (
