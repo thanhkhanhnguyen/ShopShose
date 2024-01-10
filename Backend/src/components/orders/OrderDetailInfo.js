@@ -12,8 +12,8 @@ const OrderDetailInfo = (props) => {
           <div className="text">
             <h6 className="mb-1">Customer</h6>
             <p className="mb-1">
-              {order.user.name} <br />
-              <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
+              {order[0].user.fullName} <br />
+              <a href={`mailto:${order[0].user.email}`}>{order[0].user.email}</a>
             </p>
           </div>
         </article>
@@ -26,8 +26,8 @@ const OrderDetailInfo = (props) => {
           <div className="text">
             <h6 className="mb-1">Order info</h6>
             <p className="mb-1">
-              Shipping: {order.shippingAddress.country} <br /> Pay method:{" "}
-              {order.paymentMethod}
+              Shipping: {order[0].order.address} <br /> Pay method:{" "}
+              {order[0].order.paymentId}
             </p>
           </div>
         </article>
@@ -40,10 +40,10 @@ const OrderDetailInfo = (props) => {
           <div className="text">
             <h6 className="mb-1">Deliver to</h6>
             <p className="mb-1">
-              Address: {order.shippingAddress.city}
+              Address: {order[0].user.address}
               <br />
-              {order.shippingAddress.address}
-              <br /> {order.shippingAddress.postalCode}
+              {order[0].user.address}
+              <br /> {order[0].user.address}
             </p>
           </div>
         </article>

@@ -6,8 +6,14 @@ import { useDispatch } from "react-redux";
 import { listOrders } from "../redux/Actions/OrderActions";
 
 const OrderScreen = () => {
+  const userLogin = JSON.parse(localStorage.getItem("userInfo"));
+  console.log('Bearer ' + String(userLogin.accessToken));
+  const config = {
+    headers: {
+      "Authorization": 'Bearer ' + String(userLogin.accessToken),
+    },
+  };
   const dispatch = useDispatch();
-
   useEffect(() => {
     dispatch(listOrders());
   }, [dispatch]);
@@ -17,7 +23,7 @@ const OrderScreen = () => {
       <Sidebar />
       <main className="main-wrap">
         <Header />
-        <OrderMain />
+        <OrderMain config={config} />
       </main>
     </>
   );

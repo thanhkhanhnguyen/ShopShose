@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import {
   deliveredOrder,
   getOrderDetails,
@@ -21,27 +22,25 @@ const ToastObjects = {
 };
 
 const OrderDetailmain = (props) => {
-  const { orderId } = props;
-  const dispatch = useDispatch();
-
-  const orderDetails = useSelector((state) => state.orderDetails);
-  const { loading, error, order } = orderDetails;
-
-  const orderDelivered = useSelector((state) => state.orderDelivered);
-  const { loading: loadingDelivered, success: successDelivered } =
-    orderDelivered;
-
+  const { orderId, config } = props;
+  console.log(config);
+  console.log(`https://localhost:7296/api/Admin/get-orderDetail/${orderId}`);
+  const [order, setOrder] = useState([]);
+  const handleGetOrderDetail = async () => {
+    await axios.post(
+    `https://localhost:7296/api/Admin/get-orderDetail/${orderId}`, {},
+    config
+  ).then(response => {
+    console.log(response);
+    setOrder(response.data.metadata);
+  }).catch(error => {
+    console.error(error)
+  });
+} 
   useEffect(() => {
-    dispatch(getOrderDetails(orderId));
-  }, [dispatch, orderId, successDelivered]);
-
-  const deliverHandler = () => {
-    if (!order.isPaid) {
-      toast.warning("Order is not paid.", ToastObjects);
-    } else {
-      dispatch(deliveredOrder(order));
-    }
-  };
+    handleGetOrderDetail();
+    // await checkCurrentOrderStatus();
+  }, [])
 
   return (
     <>
@@ -52,12 +51,6 @@ const OrderDetailmain = (props) => {
             Back To Orders
           </Link>
         </div>
-
-        {loading ? (
-          <Loading />
-        ) : error ? (
-          <Message variant="alert-danger">{error}</Message>
-        ) : (
           <div className="card">
             <header className="card-header p-3 Header-green">
               <div className="row align-items-center ">
@@ -65,12 +58,12 @@ const OrderDetailmain = (props) => {
                   <span>
                     <i className="far fa-calendar-alt mx-2"></i>
                     <b className="text-white">
-                      {moment(order.createdAt).format("llll")}
+                      {moment(order[0].order.createdAt).format("llll")}
                     </b>
                   </span>
                   <br />
                   <small className="text-white mx-3 ">
-                    Order ID: {order._id}
+                    Order ID: #{order[0].order.id}
                   </small>
                 </div>
                 <div className="col-lg-6 col-md-6 ms-auto d-flex justify-content-end align-items-center">
@@ -79,10 +72,11 @@ const OrderDetailmain = (props) => {
                     style={{ maxWidth: "200px" }}
                   >
                     <option>Change status</option>
-                    <option>Awaiting payment</option>
-                    <option>Confirmed</option>
-                    <option>Shipped</option>
-                    <option>Delivered</option>
+                    <option id="pending" value={0}>Pending</option>
+                    <option id="confirmed" value={1}>Confirmed</option>
+                    <option id="shipped" value={2}>Shipped</option>
+                    <option id="cancelled" value={3}>Cancelled</option>
+                    <option id="completed" value={4}>Completed</option>
                   </select>
                   <Link className="btn btn-success ms-2" to="#">
                     <i className="fas fa-print"></i>
@@ -97,7 +91,7 @@ const OrderDetailmain = (props) => {
               <div className="row">
                 <div className="col-lg-9">
                   <div className="table-responsive">
-                    <OrderDetailProducts order={order} loading={loading} />
+                    <OrderDetailProducts order={order} />
                   </div>
                 </div>
                 {/* Payment Info */}
@@ -110,9 +104,9 @@ const OrderDetailmain = (props) => {
                       </button>
                     ) : (
                       <>
-                        {loadingDelivered && <Loading />}
+
                         <button
-                          onClick={deliverHandler}
+                        
                           className="btn btn-dark col-12"
                         >
                           MARK AS DELIVERED
@@ -124,7 +118,6 @@ const OrderDetailmain = (props) => {
               </div>
             </div>
           </div>
-        )}
       </section>
     </>
   );

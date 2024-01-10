@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { lisCategories } from "../../redux/Actions/CategoryActions";
 import { lisProducts } from "../../redux/Actions/ProductActions";
 import Message from "../LoadingError/Error";
-import Loading from "../LoadingError/Loading";
 import Product from "./Product";
 
 const MainProducts = () => {
@@ -153,7 +151,7 @@ const MainProducts = () => {
               {/* Products */}
               {sortList.length ? (
                 sortList.map((product) => (
-                  <Product product={product} key={product._id} />
+                  <Product product={product} key={product.id} />
                 ))
               ) : (
                 <div className="d-flex justify-content-center col-12">

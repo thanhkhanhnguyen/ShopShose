@@ -1,19 +1,34 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import { useSelector } from "react-redux";
 import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 import Orders from "./Orders";
 
-const OrderMain = () => {
-  const orderList = useSelector((state) => state.orderList);
-  const { loading, error, orders } = orderList;
-
+const OrderMain = (props) => {
+  const { config } = props;
+  const [orders, setOrders] = useState([]);
+  const handleGetNewOrders = async () => {
+    await axios.get(
+    "https://localhost:7296/api/Admin/orders",
+    config
+  ).then(response => {
+    console.log(response);
+    setOrders(response.data.metadata);
+  }).catch(error => {
+    console.error(error)
+  });
+} 
+  useEffect(() => {
+    handleGetNewOrders();
+  }, [])
   const [searchOrder, setSearchOrder] = useState("");
   const [statusList] = useState([
-    "Paid",
-    "Not Paid",
-    "Paid And Delivered",
-    "Paid Not Yet Delivered",
+    "Pending",
+    "Confirmed",
+    "Shipped",
+    "Cancelled",
+    "Completed",
   ]);
   const [selectedStatus, setSelectedStatus] = useState();
   const [sortList] = useState([
@@ -140,13 +155,7 @@ const OrderMain = () => {
         </header>
         <div className="card-body">
           <div className="table-responsive">
-            {loading ? (
-              <Loading />
-            ) : error ? (
-              <Message variant="alert-danger">{error}</Message>
-            ) : (
               <Orders sortOrders={sortOrders} />
-            )}
           </div>
         </div>
       </div>
