@@ -24,7 +24,9 @@ export const lisProducts = () => async (dispatch, getState) => {
     const userInfo = localStorage.getItem("userInfo");
 
     const config = {
-      headers: { Authorization: `Bearer ${userInfo.token}` },
+      headers: {
+        "Authorization": 'Bearer ' + String(userInfo.accessToken),
+      },
     };
 
     const { data } = await axios.get("https://localhost:7296/api/Product", config);

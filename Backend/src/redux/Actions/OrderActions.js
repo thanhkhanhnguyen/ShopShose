@@ -17,15 +17,15 @@ export const listOrders = () => async (dispatch, getState) => {
   try {
     dispatch({ type: ORDER_LIST_REQUEST });
 
-    const {
-      userLogin: { userInfo },
-    } = getState();
+    const userInfo = localStorage.getItem("userInfo");
 
     const config = {
-      headers: { Authorization: `Bearer ${userInfo.token}` },
+      headers: {
+        "Authorization": 'Bearer ' + String(userInfo.accessToken),
+      },
     };
 
-    const { data } = await axios.get(`https://localhost:7296/api/Admin/orders`, config);
+    const { data } = await axios.get("https://localhost:7296/api/Admin/orders", config);
 
     dispatch({ type: ORDER_LIST_SUCCESS, payload: data });
   } catch (error) {

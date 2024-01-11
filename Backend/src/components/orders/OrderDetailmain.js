@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import {
-  deliveredOrder,
-  getOrderDetails,
-} from "./../../redux/Actions/OrderActions";
+
 import Message from "./../LoadingError/Error";
 import Loading from "./../LoadingError/Loading";
 import OrderDetailInfo from "./OrderDetailInfo";
@@ -13,6 +9,7 @@ import OrderDetailProducts from "./OrderDetailProducts";
 import moment from "moment";
 import Toast from "../LoadingError/Toast";
 import { toast } from "react-toastify";
+import { parseOrderStatus } from "../../services/order-status";
 
 const ToastObjects = {
   pauseOnFocusLoss: false,
@@ -22,26 +19,97 @@ const ToastObjects = {
 };
 
 const OrderDetailmain = (props) => {
-  const { orderId, config } = props;
-  console.log(config);
-  console.log(`https://localhost:7296/api/Admin/get-orderDetail/${orderId}`);
+  const { orderId, config, userLogin } = props;
   const [order, setOrder] = useState([]);
-  const handleGetOrderDetail = async () => {
-    await axios.post(
-    `https://localhost:7296/api/Admin/get-orderDetail/${orderId}`, {},
-    config
-  ).then(response => {
-    console.log(response);
-    setOrder(response.data.metadata);
-  }).catch(error => {
-    console.error(error)
-  });
-} 
-  useEffect(() => {
-    handleGetOrderDetail();
-    // await checkCurrentOrderStatus();
-  }, [])
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  const handleGetOrderDetail = async () => {
+    try {
+      const response = await axios.post(
+        `https://localhost:7296/api/Admin/get-orderDetail/${orderId}`,
+        {},
+        config
+      );
+      setOrder(response.data.metadata);
+      setLoading(false);
+      handleOrderStatus(Number(response.data.metadata[0].order.status));
+    } catch (error) {
+      console.error(error);
+      setError("Error fetching data from the API");
+      setLoading(false);
+    }
+  };
+  const handleOrderStatus = async (status) => {
+    var pending = document.getElementById("pending");
+    var confirmed = document.getElementById("confirmed");
+    var shipped = document.getElementById("shipped");
+    var cancelled = document.getElementById("cancelled");
+    var completed = document.getElementById("completed");
+    if (status == 0) {
+      shipped.disabled = true;
+      pending.disabled = true;
+      completed.disabled = true;
+    }
+    else if (status == 1) {
+      confirmed.disabled = true;
+      pending.disabled = true;
+      cancelled.disabled = true;
+    }
+    else if (status == 2) {
+      shipped.disabled = true;
+      pending.disabled = true;
+      confirmed.disabled = true;
+      cancelled.disabled = true;
+    }
+    else if (status == 3 || status == 4) {
+      shipped.disabled = true;
+      pending.disabled = true;
+      confirmed.disabled = true;
+      cancelled.disabled = true;
+      completed.disabled = true;
+    }
+  }
+  useEffect(() => {
+    const fetchData = async () => {
+      // Gọi handleGetOrderDetail
+      await handleGetOrderDetail();
+    };
+  
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <Message variant="danger">{error}</Message>;
+  }
+  const handleChangeOrderStatus = async () => {
+    try {
+    const selectedStatus = document.getElementById("order-status").value;
+    if (selectedStatus == 5) return;
+    else {
+      console.log(orderId);
+      console.log(selectedStatus);
+      console.log(config);
+      console.log(userLogin);
+      const response = await axios.patch("https://localhost:7296/api/Admin/status", {
+        orderId: orderId,
+        status: selectedStatus
+      }, {
+        headers: {
+          "Authorization": 'Bearer ' + String(userLogin.accessToken),
+          "Content-Type": 'application/json',
+        },
+      });
+      alert(response.data.message);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  }
   return (
     <>
       <Toast />
@@ -65,22 +133,26 @@ const OrderDetailmain = (props) => {
                   <small className="text-white mx-3 ">
                     Order ID: #{order[0].order.id}
                   </small>
+                  <span className="badge rounded-pill alert alert-success text-success">
+                      {parseOrderStatus(order[0].order.status)}
+                    </span>
                 </div>
                 <div className="col-lg-6 col-md-6 ms-auto d-flex justify-content-end align-items-center">
                   <select
                     className="form-select d-inline-block"
+                    id="order-status"
                     style={{ maxWidth: "200px" }}
                   >
-                    <option>Change status</option>
+                    <option value={5}>Change status</option>
                     <option id="pending" value={0}>Pending</option>
                     <option id="confirmed" value={1}>Confirmed</option>
                     <option id="shipped" value={2}>Shipped</option>
                     <option id="cancelled" value={3}>Cancelled</option>
                     <option id="completed" value={4}>Completed</option>
                   </select>
-                  <Link className="btn btn-success ms-2" to="#">
+                  <button className="btn btn-success ms-2" onClick={handleChangeOrderStatus}>
                     <i className="fas fa-print"></i>
-                  </Link>
+                  </button>
                 </div>
               </div>
             </header>

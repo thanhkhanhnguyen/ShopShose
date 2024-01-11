@@ -15,8 +15,8 @@ const OrderScreen = () => {
   };
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(listOrders());
-  }, [dispatch]);
+    listOrders();
+  }, []);
 
   return (
     <>

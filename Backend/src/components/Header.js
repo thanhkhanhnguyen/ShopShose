@@ -5,9 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/Actions/UserActions";
 
 const Header = () => {
-  const dispatch = useDispatch();
 
-  const userLogin = useSelector((state) => state.userLogin);
+  const userLogin = localStorage.getItem("userInfo");
   const { userInfo } = userLogin;
 
   useEffect(() => {
@@ -30,7 +29,7 @@ const Header = () => {
   }, []);
 
   const logoutHandler = () => {
-    dispatch(logout());
+    logout();
   };
 
   return (

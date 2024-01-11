@@ -29,7 +29,7 @@ function App() {
       dispatch(lisProducts());
       dispatch(listOrders());
     }
-  }, [dispatch, userInfo]);
+  }, []);
 
   return (
     <>

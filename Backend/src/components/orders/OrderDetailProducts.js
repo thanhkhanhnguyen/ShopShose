@@ -56,16 +56,7 @@ const OrderDetailProducts = (props) => {
                   <b className="h5">${order[0].order.total}</b>
                 </dd>
               </dl>
-              <dl className="dlist">
-                <dt className="text-muted">Status:</dt>
-                <dd>
-                  {
-                    <span className="badge rounded-pill alert alert-success text-success">
-                      {parseOrderStatus(order[0].order.payMethod)}
-                    </span>
-                  }
-                </dd>
-              </dl>
+              
             </article>
           </td>
         </tr>)
