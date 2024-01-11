@@ -29,7 +29,7 @@ export const login = (email, password) => async (dispatch) => {
     };
 
     const { data } = await axios.post(
-      `http://localhost:5134/api/Auth/login`,
+      `https://localhost:7296/api/Auth/login`,
       { email, password },
       config
     );
@@ -76,7 +76,7 @@ export const register = (name, email, password, phone) => async (dispatch) => {
     // );
 
     const { data } = await axios.post(
-      `http://localhost:5134/api/Auth/register`,
+      `https://localhost:7296/api/Auth/register`,
       { fullName: name, email, password, phone, address: "string" },
       config
     );

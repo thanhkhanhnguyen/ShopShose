@@ -16,7 +16,7 @@ export class ProductDataService {
   // Product list
   async listProduct() {
     // return await axios.get("https://localhost:7296/api/Product");
-    return await axios.get("http://localhost:5134/api/Product");
+    return await axios.get("https://localhost:7296/api/Product");
   }
 }
 
@@ -24,7 +24,7 @@ export class ProductDataService {
 export const listProductDetails = (id) => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_DETAIL_REQUEST });
-    const { data } = await axios.get(`http://localhost:5134/${id}`);
+    const { data } = await axios.get(`https://localhost:7296/${id}`);
     console.log(data);
     dispatch({ type: PRODUCT_DETAIL_SUCCESS, payload: data });
   } catch (error) {
@@ -61,7 +61,7 @@ export const createProductReview =
       //await axios.post(`/api/products/${productId}/review`, review, config);
       await axios.post(
         // `https://localhost:7296/api/Product/${productId}`,
-        `http://localhost:5134/api/Comment`,
+        `https://localhost:7296/api/Comment`,
         review,
         config
       );

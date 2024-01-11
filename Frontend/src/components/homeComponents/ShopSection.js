@@ -51,7 +51,7 @@ const ShopSection = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const rs = await axios.get("http://localhost:5134/api/Product");
+      const rs = await axios.get("https://localhost:7296/api/Product");
       setProducts(rs?.data);
       // console.log(rs);
     };
@@ -64,12 +64,12 @@ const ShopSection = () => {
       if (searchProduct !== "") {
         setCurrentPage(1);
         const rs = await axios.get(
-          `http://localhost:5134/search?searchString=${searchProduct}`
+          `https://localhost:7296/search?searchString=${searchProduct}`
         );
         setProducts(rs?.data);
       } else {
         setCurrentPage(1);
-        const rs = await axios.get("http://localhost:5134/api/Product");
+        const rs = await axios.get("https://localhost:7296/api/Product");
         setProducts(rs?.data);
       }
       // console.log(rs);

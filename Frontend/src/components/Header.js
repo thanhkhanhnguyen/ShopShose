@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { logout } from "../redux/Actions/UserActions";
 import axios from "axios";
+import { getName } from "../jwt/decodeJwt";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -20,8 +21,15 @@ const Header = () => {
     dispatch(logout());
   };
 
+  const [userName, setUserName] = useState("");
+
   useEffect(() => {
     const userLogin = JSON.parse(localStorage.getItem("userInfo"));
+    if (userLogin) {
+      const name = getName(userLogin.metadata.accessToken);
+
+      setUserName(name);
+    }
 
     const fetchCart = async () => {
       if (userLogin) {
@@ -31,7 +39,7 @@ const Header = () => {
           },
         };
         const response = await axios.get(
-          "http://localhost:5134/api/Cart",
+          "https://localhost:7296/api/Cart",
           config
         );
         // setDataCart(response.data);
@@ -166,7 +174,7 @@ const Header = () => {
                       aria-haspopup="true"
                       aria-expanded="false"
                     >
-                      Hi, {userInfo.name}
+                      Hi, {userName}
                     </button>
                     <div className="dropdown-menu">
                       <Link className="dropdown-item" to="/profile">

@@ -118,13 +118,13 @@ const CartScreen = ({ match, location, history }) => {
     };
     const fetchCart = async () => {
       const response = await axios.get(
-        "http://localhost:5134/api/Cart",
+        "https://localhost:7296/api/Cart",
         config
       );
       setDataCart(response.data);
 
       const totalCart = await axios.get(
-        "http://localhost:5134/api/Cart/total",
+        "https://localhost:7296/api/Cart/total",
         config
       );
       setCartTotal(totalCart.data);
@@ -185,7 +185,7 @@ const CartScreen = ({ match, location, history }) => {
       };
 
       const response = await axios.post(
-        "http://localhost:5134/api/payment",
+        "https://localhost:7296/api/payment",
         data,
         config
       );
@@ -210,7 +210,7 @@ const CartScreen = ({ match, location, history }) => {
       };
 
       const response = await axios.post(
-        "http://localhost:5134/api/payment",
+        "https://localhost:7296/api/payment",
         data,
         config
       );
