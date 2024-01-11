@@ -12,22 +12,30 @@ export const cartReducer = (
 ) => {
   switch (action.type) {
     case CART_ADD_ITEM:
-      const item = action.payload;
-      const existItem = state.cartItems.find((x) => x.product === item.product);
+      // const item = action.payload;
+      // const existItem = state.cartItems.find((x) => x.product === item.product);
 
-      if (existItem) {
-        return {
-          ...state,
-          cartItems: state.cartItems.map((x) =>
-            x.product === existItem.product ? item : x
-          ),
-        };
-      } else {
-        return {
-          ...state,
-          cartItems: [...state.cartItems, item],
-        };
-      }
+      // if (existItem) {
+      //   return {
+      //     ...state,
+      //     cartItems: state.cartItems.map((x) =>
+      //       x.product === existItem.product ? item : x
+      //     ),
+      //   };
+      // } else {
+      //   return {
+      //     ...state,
+      //     cartItems: [...state.cartItems, item],
+      //   };
+      // }
+
+      // Thực hiện xử lý thêm sản phẩm vào giỏ hàng
+      const { productId, quantity } = action.payload;
+      const newItem = { productId, quantity };
+      return {
+        ...state,
+        items: [...state.items, newItem],
+      };
 
     case CART_REMOVE_ITEM:
       return {

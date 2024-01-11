@@ -14,6 +14,7 @@ import Message from "./../components/LoadingError/Error";
 import Toast from "./../components/LoadingError/Toast";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { addToCart } from "../redux/Actions/CartActions";
 
 const ToastObjects = {
   pauseOnFocusLoss: false,
@@ -53,6 +54,7 @@ const SingleProduct = ({ history, match }) => {
   const { loading, error, product } = productDetails;
 
   const userLogin = useSelector((state) => state.userLogin);
+  const cartRedux = useSelector((state) => state.cart.cartItems);
   const { userInfo } = userLogin;
 
   const productReviewCreate = useSelector((state) => state.productReviewCreate);
@@ -62,9 +64,10 @@ const SingleProduct = ({ history, match }) => {
     success: successCreateReview,
   } = productReviewCreate;
 
-  const [cart, setCart] = useState([]);
+  // const [cart, setCart] = useState([]);
 
   const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -88,6 +91,9 @@ const SingleProduct = ({ history, match }) => {
 
   useEffect(() => {
     getReviews();
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const average = totalRating / reviews.length || 0;
+    setAverageRating(Math.round(average));
   }, [productId, submitHandler]);
 
   // useEffect(() => {
@@ -109,10 +115,10 @@ const SingleProduct = ({ history, match }) => {
     dispatch(listProductDetails(productId));
   }, [dispatch, productId, successCreateReview]);
 
-  const AddToCartHandle = (e) => {
-    e.preventDefault();
-    history.push(`/cart/${productId}?qty=${qty}`);
-  };
+  // const AddToCartHandle = (e) => {
+  //   e.preventDefault();
+  //   history.push(`/cart/${productId}?qty=${qty}`);
+  // };
 
   // //handle add to cart into session storage
   // const addToCart = (item) => {
@@ -127,45 +133,59 @@ const SingleProduct = ({ history, match }) => {
   //   sessionStorage.setItem("cart", JSON.stringify(updatedCart));
   // };
 
-  // Assuming `cart` is an array of items in the state
-  const addToCart = (item) => {
-    const { id, name, price } = item;
-
-    // Retrieve the current cart from sessionStorage
-    const existingCart = JSON.parse(sessionStorage.getItem("cart")) || [];
-
-    // Check if the product with the same ID already exists in the cart
-    const existingProduct = existingCart.find((product) => product.id === id);
-
-    if (existingProduct) {
-      // If the product exists, update the quantity
-      existingProduct.inQuantity += inQuantity * 1;
-    } else {
-      // If the product doesn't exist, add a new item to the cart
-      const newProduct = {
-        id,
-        name,
-        price,
-        inQuantity: inQuantity * 1,
+  // add to cart
+  const addToCart = async (item) => {
+    // Gửi action addToCart với productId và quantity
+    const userLogin = JSON.parse(localStorage.getItem("userInfo"));
+    const config = {
+      headers: {
+        Authorization: "Bearer " + String(userLogin.metadata.accessToken),
+      },
+    };
+    try {
+      const { id } = item;
+      const data = {
+        productId: id,
+        quantity: inQuantity * 1,
       };
-      existingCart.push(newProduct);
-    }
 
-    // Update the local state and sessionStorage with the modified cart
-    setCart(existingCart);
-    sessionStorage.setItem("cart", JSON.stringify(existingCart));
+      const response = await axios.post(
+        "http://localhost:5134/api/Cart/add",
+        data,
+        config
+      );
+
+      const response2 = await axios.get(
+        "http://localhost:5134/api/Cart",
+        config
+      );
+      dispatch({ type: "UPDATE_NUM_CART", payload: response2.data.length });
+      // sessionStorage.setItem("numCart", JSON.stringify(response2.data.length));
+
+      toast.success("Add to cart successfully", ToastObjects);
+
+      // Xử lý kết quả response tại đây nếu cần
+      console.log(response.data);
+    } catch (error) {
+      // Xử lý lỗi tại đây
+      console.error("Error adding to cart:", error);
+    }
   };
 
-  // const submitHandler = (e) => {
-  //   e.preventDefault();
-  //   dispatch(
-  //     createProductReview(productId, {
-
-  //       rating,
-  //       comment,
-  //     })
-  //   );
-  // };
+  const getAllCart = async () => {
+    const userLogin = JSON.parse(localStorage.getItem("userInfo"));
+    const config = {
+      headers: {
+        Authorization: "Bearer " + String(userLogin.metadata.accessToken),
+        "Content-Type": "application/json",
+      },
+    };
+    const responseCartCurrent = await axios.get(
+      "http://localhost:5134/api/Cart",
+      config
+    );
+    console.log("cart", responseCartCurrent.data);
+  };
 
   return (
     <>
@@ -215,26 +235,15 @@ const SingleProduct = ({ history, match }) => {
                       <h6>Reviews</h6>
 
                       <Rating
-                        value={product.rating}
-                        text={`${product.numReviews} reviews`}
+                        value={averageRating}
+                        text={`${reviews.length} reviews`}
                       />
                     </div>
                     {product.quantity > 0 ? (
                       <>
                         <div className="flex-box d-flex justify-content-between align-items-center">
                           <h6>Quantity</h6>
-                          {/* <select
-                            value={qty}
-                            onChange={(e) => setQty(e.target.value)}
-                          >
-                            {[...Array(product.countInStock).keys()].map(
-                              (x) => (
-                                <option key={x + 1} value={x + 1}>
-                                  {x + 1}
-                                </option>
-                              )
-                            )}
-                          </select> */}
+
                           <input
                             type="number"
                             name="in-quantity"
@@ -249,6 +258,13 @@ const SingleProduct = ({ history, match }) => {
                         >
                           Add To Cart
                         </button>
+
+                        {/* <button
+                          onClick={() => getAllCart(product)}
+                          className="round-black-btn"
+                        >
+                          Show Cart
+                        </button> */}
                       </>
                     ) : null}
                   </div>
@@ -346,11 +362,11 @@ const SingleProduct = ({ history, match }) => {
                 ) : (
                   <div className="my-3">
                     <Message variant={"alert-warning"}>
-                      Please{" "}
+                      Please
                       <Link to="/login">
                         " <strong>Login</strong> "
-                      </Link>{" "}
-                      to write a review{" "}
+                      </Link>
+                      to write a review
                     </Message>
                   </div>
                 )}

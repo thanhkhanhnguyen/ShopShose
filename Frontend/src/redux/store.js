@@ -20,6 +20,7 @@ import {
   userRegisterReducer,
   userUpdateProfileReducer,
 } from "./Reducers/UserReducers";
+import numCartReducer from "./Reducers/CartRdc";
 
 const reducer = combineReducers({
   productList: productListReducer,
@@ -35,6 +36,7 @@ const reducer = combineReducers({
   orderPay: orderPayReducer,
   orderListMy: orderListMyReducer,
   categoryList: categoryListReducer,
+  numCart: numCartReducer,
 });
 
 // cart item
@@ -55,7 +57,8 @@ const shippingAddressFromLocalStorage = localStorage.getItem("shippingAddress")
 // initState
 const initialState = {
   cart: {
-    cartItems: cartItemsFromLocalStorage,
+    // cartItems: cartItemsFromLocalStorage,
+    cartItems: [],
     shippingAddress: shippingAddressFromLocalStorage,
   },
   userLogin: {

@@ -57,7 +57,7 @@ export const createProductReview =
         },
       };
 
-      console.log(userInfo.metadata.accessToken);
+      // console.log(userInfo.metadata.accessToken);
       //await axios.post(`/api/products/${productId}/review`, review, config);
       await axios.post(
         // `https://localhost:7296/api/Product/${productId}`,

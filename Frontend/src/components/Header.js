@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { logout } from "../redux/Actions/UserActions";
+import axios from "axios";
 
 const Header = () => {
   const dispatch = useDispatch();
 
-  const cart = useSelector((state) => state.cart);
-  const { cartItems } = cart;
+  // const cart = useSelector((state) => state.cart);
+  // const { cartItems } = cart;
+  // const numCart = sessionStorage.getItem("numCart");
+  const numCart = useSelector((state) => state.numCart.num) || 0;
+  // console.log("redux", globalNumber);
 
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -15,6 +19,36 @@ const Header = () => {
   const logoutHandler = () => {
     dispatch(logout());
   };
+
+  useEffect(() => {
+    const userLogin = JSON.parse(localStorage.getItem("userInfo"));
+
+    const fetchCart = async () => {
+      if (userLogin) {
+        const config = {
+          headers: {
+            Authorization: "Bearer " + String(userLogin.metadata.accessToken),
+          },
+        };
+        const response = await axios.get(
+          "http://localhost:5134/api/Cart",
+          config
+        );
+        // setDataCart(response.data);
+
+        dispatch({
+          type: "UPDATE_NUM_CART",
+          payload: response.data.length || 0,
+        });
+      } else {
+        dispatch({
+          type: "UPDATE_NUM_CART",
+          payload: 0,
+        });
+      }
+    };
+    fetchCart();
+  }, []);
 
   return (
     <div>
@@ -106,7 +140,7 @@ const Header = () => {
                   )}
                   <Link to="/cart" className="cart-mobile-icon">
                     <i className="fas fa-shopping-bag"></i>
-                    <span className="badge">{cartItems.length}</span>
+                    <span className="badge">{numCart}</span>
                   </Link>
                 </div>
               </div>
@@ -155,7 +189,7 @@ const Header = () => {
                 )}
                 <Link to="/cart">
                   <i className="fas fa-shopping-bag"></i>
-                  <span className="badge">{cartItems.length}</span>
+                  <span className="badge">{numCart}</span>
                 </Link>
               </div>
             </div>

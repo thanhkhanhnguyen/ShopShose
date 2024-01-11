@@ -15,12 +15,12 @@ import ProfileScreen from "./screens/ProfileScreen";
 import Register from "./screens/Register";
 import ShippingScreen from "./screens/ShippingScreen";
 import SingleProduct from "./screens/SingleProduct";
-import Log from"./screens/Log";
+import Log from "./screens/Log";
+import CheckOutSuccess from "./screens/CheckOutSuccess";
 const App = () => {
   return (
     <Router>
       <Switch>
-      
         <Route path="/" component={HomeScreen} exact />
         <Route path="/log" component={Log} />
         <Route path="/products/:id" component={SingleProduct} />
@@ -32,6 +32,7 @@ const App = () => {
         <PrivateRouter path="/payment" component={PaymentScreen} />
         <PrivateRouter path="/placeorder" component={PlaceOrderScreen} />
         <PrivateRouter path="/order/:id" component={OrderScreen} />
+        <Route path="/check-out-success" component={CheckOutSuccess} />
         <Route path="*" component={NotFound} />
       </Switch>
     </Router>
