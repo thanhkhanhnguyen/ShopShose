@@ -83,7 +83,7 @@ const SingleProduct = ({ history, match }) => {
   //get review
   const getReviews = async () => {
     const response = await axios.get(
-      `http://localhost:5134/api/Comment/product/${productId}`
+      `https://localhost:7296/api/Comment/product/${productId}`
     );
     // console.log(response?.data);
     setReviews(response?.data || []);
@@ -98,7 +98,7 @@ const SingleProduct = ({ history, match }) => {
 
   // useEffect(() => {
   //   const fetchDT = async () => {
-  //     const rs = await axios.get(`http://localhost:5134/1`);
+  //     const rs = await axios.get(`https://localhost:7296/1`);
   //     console.log("fetchData", rs);
   //   };
 
@@ -150,13 +150,13 @@ const SingleProduct = ({ history, match }) => {
       };
 
       const response = await axios.post(
-        "http://localhost:5134/api/Cart/add",
+        "https://localhost:7296/api/Cart/add",
         data,
         config
       );
 
       const response2 = await axios.get(
-        "http://localhost:5134/api/Cart",
+        "https://localhost:7296/api/Cart",
         config
       );
       dispatch({ type: "UPDATE_NUM_CART", payload: response2.data.length });
@@ -181,7 +181,7 @@ const SingleProduct = ({ history, match }) => {
       },
     };
     const responseCartCurrent = await axios.get(
-      "http://localhost:5134/api/Cart",
+      "https://localhost:7296/api/Cart",
       config
     );
     console.log("cart", responseCartCurrent.data);

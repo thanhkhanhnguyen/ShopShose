@@ -33,7 +33,7 @@ const ItemCart = (props) => {
       };
 
       const response = await axios.post(
-        "http://localhost:5134/api/Cart/add",
+        "https://localhost:7296/api/Cart/add",
         data,
         config
       );
@@ -53,7 +53,7 @@ const ItemCart = (props) => {
     };
 
     const response = await axios.post(
-      `http://localhost:5134/api/Cart/remove/${id}`,
+      `https://localhost:7296/api/Cart/remove/${id}`,
       {},
       config
     );
