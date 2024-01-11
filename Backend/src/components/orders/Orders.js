@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import moment from "moment";
-
+import { parseOrderStatus } from "../../services/order-status";
 const Orders = (props) => {
   const { sortOrders } = props;
 
@@ -23,12 +23,12 @@ const Orders = (props) => {
       <tbody>
         {sortOrders.length ? (
           sortOrders.map((order) => (
-            <tr key={order._id}>
+            <tr key={order.id}>
               <td>
-                <b>{order.user.name}</b>
+                <b>{order.userName}</b>
               </td>
-              <td>{order.user.email}</td>
-              <td>{order.totalPrice}</td>
+              <td>{order.email}</td>
+              <td>{order.total}</td>
               <td>
                 {order.isPaid ? (
                   <span className="badge rounded-pill alert-success">
@@ -42,14 +42,11 @@ const Orders = (props) => {
               </td>
               <td>{moment(order.createdAt).format("MMM Do YY")}</td>
               <td>
-                {order.isDelivered ? (
-                  <span className="badge btn-success">Delivered</span>
-                ) : (
-                  <span className="badge btn-dark">Not Delivered</span>
-                )}
+                  <span className="badge btn-success">{parseOrderStatus(order.payMethod)}</span>
+                  {/* <span className="badge btn-dark">Not Delivered</span> */}
               </td>
               <td className="d-flex justify-content-end align-item-center">
-                <Link to={`/order/${order._id}`} className="text-success">
+                <Link to={`/order/${order.id}`} className="text-success">
                   <i className="fas fa-eye"></i>
                 </Link>
               </td>

@@ -21,37 +21,19 @@ import { logout } from "./UserActions";
 // Product list
 export const lisProducts = () => async (dispatch, getState) => {
   try {
-    dispatch({ type: PRODUCT_LIST_REQUEST });
-
-    const {
-      userLogin: { userInfo },
-    } = getState();
+    const userInfo = localStorage.getItem("userInfo");
 
     const config = {
       headers: { Authorization: `Bearer ${userInfo.token}` },
     };
 
-    const { data } = await axios.get(`/api/products/all`, config);
-
+    const { data } = await axios.get("https://localhost:7296/api/Product", config);
+    console.log(data);
     dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
   } catch (error) {
-    const message =
-      error.response && error.response.data.message
-        ? error.response.data.message
-        : error.message;
-    if (message === "Not authorized, token failed") {
-      dispatch(logout());
-    }
-    dispatch({
-      type: PRODUCT_LIST_FAIL,
-      payload:
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message,
-    });
-  }
+    console.error(error);
 };
-
+}
 // Delete product
 export const deleteProduct = (id) => async (dispatch, getState) => {
   try {
@@ -87,45 +69,19 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
 };
 
 // Create product
-export const createProduct =
-  (name, price, countInStock, description, category, image) =>
-  async (dispatch, getState) => {
+export const createProduct = async (name, price, quantity, description, categoryId, image, config) => {
     try {
-      dispatch({ type: PRODUCT_CREATE_REQUEST });
-
-      const {
-        userLogin: { userInfo },
-      } = getState();
-
-      const config = {
-        headers: { Authorization: `Bearer ${userInfo.token}` },
-      };
-
-      const { data } = await axios.post(
-        `/api/products/`,
-        { name, price, countInStock, description, category, image },
+      
+      const data  = await axios.post(
+        "https://localhost:7296/api/Product",
+        { name, price, quantity, description, categoryId, image: "" },
         config
       );
-
-      dispatch({ type: PRODUCT_CREATE_SUCCESS, payload: data });
+      return data.data;
     } catch (error) {
-      const message =
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message;
-      if (message === "Not authorized, token failed") {
-        dispatch(logout());
-      }
-      dispatch({
-        type: PRODUCT_CREATE_FAIL,
-        payload:
-          error.response && error.response.data.message
-            ? error.response.data.message
-            : error.message,
-      });
-    }
+      console.error(error);
   };
-
+}
 // Edit product
 export const editProduct = (id) => async (dispatch) => {
   try {

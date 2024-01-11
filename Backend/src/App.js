@@ -22,11 +22,10 @@ import UsersScreen from "./screens/UsersScreen";
 function App() {
   const dispatch = useDispatch();
 
-  const userLogin = useSelector((state) => state.userLogin);
-  const { userInfo } = userLogin;
+  const userInfo = localStorage.getItem("userInfo");
 
   useEffect(() => {
-    if (userInfo && userInfo.isAdmin) {
+    if (userInfo) {
       dispatch(lisProducts());
       dispatch(listOrders());
     }

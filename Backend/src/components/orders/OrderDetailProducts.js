@@ -1,19 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { parseOrderStatus } from "../../services/order-status";
 
 const OrderDetailProducts = (props) => {
-  const { loading, order } = props;
-
-  if (!loading) {
-    // Calculate Price
-    const addDecimal = (num) => {
-      return (Math.round(num * 100) / 100).toFixed(2);
-    };
-
-    order.itemsPrice = addDecimal(
-      order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0)
-    );
-  }
+  const { order } = props;
+  console.log(order.length);
 
   return (
     <table className="table border table-lg">
@@ -28,59 +19,57 @@ const OrderDetailProducts = (props) => {
         </tr>
       </thead>
       <tbody>
-        {order.orderItems.map((item, index) => (
+        {order.length && order.map((item, index) => (
           <tr key={index}>
             <td>
               <Link className="itemside" to="#">
                 <div className="left">
                   <img
-                    src={item.image.url}
-                    alt={item.name}
+                    src={item.product.image}
+                    alt={item.product.name}
                     style={{ width: "40px", height: "40px" }}
                     className="img-xs"
                   />
                 </div>
-                <div className="info">{item.name}</div>
+                <div className="info">{item.product.name}</div>
               </Link>
             </td>
-            <td>${item.price}</td>
-            <td>{item.qty}</td>
-            <td className="text-end"> ${item.price * item.qty}</td>
+            <td>${item.product.price}</td>
+            <td>{item.orderDetail.quantity}</td>
+            <td className="text-end"> ${item.product.price * item.orderDetail.quantity}</td>
           </tr>
         ))}
 
-        <tr>
+        {
+          order.length && (<tr>
           <td colSpan="4">
             <article className="float-end">
               <dl className="dlist">
-                <dt>Subtotal:</dt> <dd>${order.itemsPrice}</dd>
+                <dt>Subtotal:</dt> <dd>${order[0].order.total}</dd>
               </dl>
               <dl className="dlist">
-                <dt>Shipping cost:</dt> <dd>${order.shippingPrice}</dd>
+                <dt>Shipping cost:</dt> <dd>$0</dd>
               </dl>
               <dl className="dlist">
                 <dt>Grand total:</dt>
                 <dd>
-                  <b className="h5">${order.totalPrice}</b>
+                  <b className="h5">${order[0].order.total}</b>
                 </dd>
               </dl>
               <dl className="dlist">
                 <dt className="text-muted">Status:</dt>
                 <dd>
-                  {order.isPaid ? (
+                  {
                     <span className="badge rounded-pill alert alert-success text-success">
-                      Payment done
+                      {parseOrderStatus(order[0].order.payMethod)}
                     </span>
-                  ) : (
-                    <span className="badge rounded-pill alert alert-danger text-danger">
-                      No Paid
-                    </span>
-                  )}
+                  }
                 </dd>
               </dl>
             </article>
           </td>
-        </tr>
+        </tr>)
+        }
       </tbody>
     </table>
   );

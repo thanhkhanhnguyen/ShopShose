@@ -22,14 +22,6 @@ import { logout } from "./UserActions";
 export const lisCategories = () => async (dispatch, getState) => {
   try {
     dispatch({ type: CATEGORY_LIST_REQUEST });
-    const {
-      userLogin: { userInfo },
-    } = getState();
-    const config = {
-      headers: { Authorization: `Bearer ${userInfo.token}` },
-    };
-    const { data } = await axios.get(`/api/categories/all`, config);
-    dispatch({ type: CATEGORY_LIST_SUCCESS, payload: data });
   } catch (error) {
     const message =
       error.response && error.response.data.message

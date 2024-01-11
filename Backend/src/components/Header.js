@@ -56,7 +56,7 @@ const Header = () => {
           </li>
           <li className="nav-item">
             <Link className="nav-link fw-bold text-dark" to="#">
-              Hi, {userInfo.name}
+              Admin
             </Link>
           </li>
           <li className="dropdown nav-item">
@@ -79,7 +79,7 @@ const Header = () => {
                 className="dropdown-item text-danger"
                 to="#"
               >
-                Exit
+                Logout
               </Link>
             </div>
           </li>

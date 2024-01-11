@@ -22,12 +22,13 @@ const ToastObjects = {
   autoClose: 3000,
 };
 
-const AddProductMain = () => {
+const AddProductMain = (props) => {
+  const { config } = props
   const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [countInStock, setCountInStock] = useState("");
+  const [price, setPrice] = useState(0);
+  const [quantity, setQuantity] = useState(0);
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
+  const [categoryId, setCategoryId] = useState(0);
 
   const dispatch = useDispatch();
   const inputRef = useRef(null);
@@ -36,8 +37,29 @@ const AddProductMain = () => {
   const { loading, error, product } = productCreate;
 
   const categoryList = useSelector((state) => state.categoryList);
-  const { loading: loadingList, error: errorList, categories } = categoryList;
-
+  const { loading: loadingList, error: errorList } = categoryList;
+  const categories = [
+    {
+      id: 1,
+      name: 'Category 1'
+    },
+    {
+      id: 2,
+      name: 'Category 2'
+    },
+    {
+      id: 3,
+      name: 'Category 3'
+    },
+    {
+      id: 4,
+      name: 'Category 4'
+    },
+    {
+      id: 5,
+      name: 'Category 5'
+    },
+  ]
   const imageUpload = useSelector((state) => state.imageUpload);
   const { loading: loadingImage, error: errorImage, image } = imageUpload;
 
@@ -45,7 +67,6 @@ const AddProductMain = () => {
   const { success: successDelete } = imageDelete;
 
   useEffect(() => {
-    dispatch(lisCategories());
     if (product) {
       toast.success("Product Added", ToastObjects);
       dispatch({ type: PRODUCT_CREATE_RESET });
@@ -53,17 +74,16 @@ const AddProductMain = () => {
       resetFileInput();
       setName("");
       setPrice(0);
-      setCountInStock(0);
+      setQuantity(0);
       setDescription("");
-      setCategory("");
+      setCategoryId("");
     }
   }, [product, dispatch, successDelete]);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    dispatch(
-      createProduct(name, price, countInStock, description, category, image)
-    );
+    const result = createProduct(name, price, quantity, description, categoryId, image, config);
+    alert(result);
   };
 
   const handleUpload = async (e) => {
@@ -124,7 +144,7 @@ const AddProductMain = () => {
                   {loading && <Loading />}
                   <div className="mb-4">
                     <label htmlFor="product_title" className="form-label">
-                      Product title
+                      Product Name
                     </label>
                     <input
                       type="text"
@@ -152,19 +172,19 @@ const AddProductMain = () => {
                   </div>
                   <div className="mb-4">
                     <label
-                      htmlFor="product_countInStock"
+                      htmlFor="product_quantity"
                       className="form-label"
                     >
-                      Count In Stock
+                      Quantity
                     </label>
                     <input
                       type="number"
                       placeholder="Type here"
                       className="form-control"
-                      id="product_countInStock"
+                      id="product_quantity"
                       required
-                      value={countInStock}
-                      onChange={(e) => setCountInStock(e.target.value)}
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)}
                     />
                   </div>
                   <div className="mb-4">
@@ -180,26 +200,20 @@ const AddProductMain = () => {
                   </div>
                   <div className="mb-4">
                     <label className="form-label">Categories</label>
-                    {loadingList ? (
-                      <Loading />
-                    ) : errorList ? (
-                      <Message variant="alert-danger">{errorList}</Message>
-                    ) : (
                       <select
                         name="category"
                         className="form-select"
                         required
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
+                        value={categoryId}
+                        onChange={(e) => setCategoryId(e.target.value)}
                       >
                         <option value="">Select a category</option>
                         {categories.map((category) => (
-                          <option value={category._id} key={category._id}>
+                          <option value={category.id} key={category.id}>
                             {category.name}
                           </option>
                         ))}
                       </select>
-                    )}
                   </div>
                 </div>
               </div>

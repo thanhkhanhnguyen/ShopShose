@@ -6,12 +6,13 @@ import ProductsStatistics from "./ProductsStatistics";
 import { useSelector } from "react-redux";
 
 const Main = () => {
-  const orderList = useSelector((state) => state.orderList);
-  const { loading, error, orders } = orderList;
-
-  const productList = useSelector((state) => state.productList);
-  const { products } = productList;
-
+  const userLogin = JSON.parse(localStorage.getItem("userInfo"));
+  console.log('Bearer ' + String(userLogin.accessToken));
+  const config = {
+    headers: {
+      "Authorization": 'Bearer ' + String(userLogin.accessToken),
+    },
+  };
   return (
     <>
       <section className="content-main">
@@ -19,7 +20,7 @@ const Main = () => {
           <h2 className="content-title"> Dashboard </h2>
         </div>
         {/* Top Total */}
-        <TopTotal orders={orders} products={products} />
+        <TopTotal config={config} />
 
         <div className="row">
           {/* STATICS */}
@@ -29,7 +30,7 @@ const Main = () => {
 
         {/* LATEST ORDER */}
         <div className="card mb-4 shadow-sm">
-          <LatestOrder orders={orders} loading={loading} error={error} />
+          <LatestOrder config={config} />
         </div>
       </section>
     </>

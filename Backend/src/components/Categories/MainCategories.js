@@ -6,10 +6,7 @@ import CreateCategory from "./CreateCategory";
 
 const MainCategories = () => {
   const dispatch = useDispatch();
-
-  const categoryList = useSelector((state) => state.categoryList);
-  const { loading, error, categories } = categoryList;
-
+  
   const categoryDelete = useSelector((state) => state.categoryDelete);
   const { error: errorDelete, success: successDelete } = categoryDelete;
 
@@ -29,9 +26,6 @@ const MainCategories = () => {
             <CreateCategory />
             {/* Categories table */}
             <CategoriesTable
-              categories={categories}
-              loading={loading}
-              error={error}
               errorDelete={errorDelete}
             />
           </div>
