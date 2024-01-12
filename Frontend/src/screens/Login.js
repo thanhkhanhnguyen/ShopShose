@@ -6,30 +6,39 @@ import Message from "./../components/LoadingError/Error";
 import Loading from "./../components/LoadingError/Loading";
 import { login } from "./../redux/Actions/UserActions";
 import axios from "axios";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const Login = ({ location, history }) => {
   window.scrollTo(0, 0);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
 
   const dispatch = useDispatch();
   const redirect = location.search ? location.search.split("=")[1] : "/";
 
   const userLogin = useSelector((state) => state.userLogin);
   const { error, loading, userInfo } = userLogin;
-  // const testLogin=async()=>{
-  //   const response1=await axios.post(
-  //     "https://localhost:7296/api/Auth/login",
-  //     {  email: "thanh123@gmail.com",
-  //        password: "Thanh123@"}
-  //   )
-  //   console.log(response1)
-  // }
 
-  // useEffect(() => {
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: Yup.object({
+      email: Yup.string().email("Invalid email address").required("Required"),
+      password: Yup.string()
+        .min(3, "Must be 3 characters or more")
+        .max(12, "Must be 12 character or less")
+        .required("Required"),
+    }),
 
-  //  testLogin();
-  // },[])
+    onSubmit: (values) => {
+      // alert(JSON.stringify(values, null, 2));
+      // SignIn(formik, values, toast);
+      submitHandler(values);
+    },
+  });
 
   useEffect(() => {
     if (userInfo) {
@@ -37,10 +46,13 @@ const Login = ({ location, history }) => {
     }
   }, [userInfo, history, redirect]);
 
-  const submitHandler = (e) => {
-    e.preventDefault();
+  const submitHandler = (values) => {
+    // e.preventDefault();
+    const email = values.email;
+    const password = values.password;
     dispatch(login(email, password));
   };
+
   return (
     <>
       <Header />
@@ -49,20 +61,40 @@ const Login = ({ location, history }) => {
         {loading && <Loading />}
         <form
           className="Login col-md-8 col-lg-4 col-11"
-          onSubmit={submitHandler}
+          // onSubmit={submitHandler}
+          onSubmit={formik.handleSubmit}
         >
           <input
+            id="email"
             type="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            // value={email}
+            // onChange={(e) => setEmail(e.target.value)}
+            {...formik.getFieldProps("email")}
           />
+          <div style={{ marginTop: -28 }} className="d-flex p-0">
+            {formik.touched.email && formik.errors.email ? (
+              <p className="text-error text-danger ms-auto fs-6">
+                {formik.errors.email}*
+              </p>
+            ) : null}
+          </div>
           <input
+            id="password"
             type="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            // value={password}
+            // onChange={(e) => setPassword(e.target.value)}
+
+            {...formik.getFieldProps("password")}
           />
+          <div style={{ marginTop: -28 }} className="d-flex p-0">
+            {formik.touched.password && formik.errors.password ? (
+              <p className="text-error text-danger fs-6 ms-auto">
+                {formik.errors.password}*
+              </p>
+            ) : null}
+          </div>
           <button type="submit">Login</button>
           <p>
             <Link

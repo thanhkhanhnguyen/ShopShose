@@ -823,3 +823,47 @@ textarea:focus {
 .continue-shopping-btn:hover {
   background-color: #0056b3;
 }
+
+.page-wait-order {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* order page */
+/* OrderTable.css */
+.order-container {
+  margin: 20px;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.order-table thead {
+  background-color: #f2f2f2;
+}
+
+.order-table th,
+.order-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.order-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.order-table tbody tr:hover {
+  background-color: #e0e0e0;
+}
+
+.order-row td {
+  /* Add additional styling for table cells if needed */
+}

@@ -17,6 +17,8 @@ import ShippingScreen from "./screens/ShippingScreen";
 import SingleProduct from "./screens/SingleProduct";
 import Log from "./screens/Log";
 import CheckOutSuccess from "./screens/CheckOutSuccess";
+import WaitOrder from "./screens/WaitOrder";
+import Order from "./screens/Orders";
 const App = () => {
   return (
     <Router>
@@ -32,7 +34,9 @@ const App = () => {
         <PrivateRouter path="/payment" component={PaymentScreen} />
         <PrivateRouter path="/placeorder" component={PlaceOrderScreen} />
         <PrivateRouter path="/order/:id" component={OrderScreen} />
+        <Route path="/orders" component={Order} />
         <Route path="/check-out-success" component={CheckOutSuccess} />
+        <Route path="/wait-order" component={WaitOrder} />
         <Route path="*" component={NotFound} />
       </Switch>
     </Router>
