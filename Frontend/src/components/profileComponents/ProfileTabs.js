@@ -33,11 +33,29 @@ const ProfileTabs = (props) => {
   const { loading: updateLoading } = userUpdateProfile;
 
   useEffect(() => {
-    if (user) {
-      setName(user.name);
-      setAddress(user.address);
-    }
-  }, [dispatch, user]);
+    const getData = async () => {
+      const response = await axios.post(
+        "https://localhost:7296/api/User/profile",
+        {},
+        config
+      );
+
+      // console.log(response.data);
+      // setDataUser(response.data);
+      if (response) {
+        setName(response.data.fullName);
+        setAddress(response.data.address);
+      }
+    };
+    getData();
+  }, []);
+
+  // useEffect(() => {
+  //   if (user) {
+  //     setName(user.name);
+  //     setAddress(user.address);
+  //   }
+  // }, [dispatch, user]);
 
   const userLogin = JSON.parse(localStorage.getItem("userInfo"));
   const config = {
