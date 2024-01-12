@@ -5,10 +5,14 @@ import { updateUserProfile } from "../../redux/Actions/UserActions";
 import Message from "./../LoadingError/Error";
 import Loading from "./../LoadingError/Loading";
 import Toast from "./../LoadingError/Toast";
+import axios from "axios";
 
-const ProfileTabs = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+const ProfileTabs = (props) => {
+  const { info } = props;
+  console.log(info.email);
+  const [name, setName] = useState(info.fullName || "");
+  // const [email, setEmail] = useState(info.email || "");
+  const [address, setAddress] = useState(info.address || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const toastId = React.useRef(null);
@@ -31,11 +35,18 @@ const ProfileTabs = () => {
   useEffect(() => {
     if (user) {
       setName(user.name);
-      setEmail(user.email);
+      setAddress(user.address);
     }
   }, [dispatch, user]);
 
-  const submitHandler = (e) => {
+  const userLogin = JSON.parse(localStorage.getItem("userInfo"));
+  const config = {
+    headers: {
+      Authorization: "Bearer " + String(userLogin.metadata.accessToken),
+    },
+  };
+
+  const submitHandler = async (e) => {
     e.preventDefault();
     // password match
     if (password !== confirmPassword) {
@@ -43,10 +54,19 @@ const ProfileTabs = () => {
         toastId.current = toast.error("Passwords does not match", ToastObjects);
       }
     } else {
-      // update profile
-      dispatch(updateUserProfile({ id: user._id, name, email, password }));
-      if (!toast.isActive(toastId.current)) {
+      const response = await axios.put(
+        "https://localhost:7296/api/User/edit-profile",
+        {
+          fullName: name,
+          address: address,
+        },
+        config
+      );
+      console.log(response);
+      if (response.status === 200) {
         toastId.current = toast.success("Profile Updated", ToastObjects);
+      } else {
+        toastId.current = toast.error("Updated Failed", ToastObjects);
       }
     }
   };
@@ -72,16 +92,18 @@ const ProfileTabs = () => {
 
         <div className="col-md-6">
           <div className="form">
-            <label for="account-email">E-mail Address</label>
+            <label for="account-fn">Phone Number</label>
             <input
               className="form-control"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              required
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
             />
           </div>
         </div>
-        <div className="col-md-6">
+
+        {/* <div className="col-md-6">
           <div className="form">
             <label for="account-pass">New Password</label>
             <input
@@ -102,7 +124,7 @@ const ProfileTabs = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
-        </div>
+        </div> */}
         <button type="submit">Update Profile</button>
       </form>
     </>

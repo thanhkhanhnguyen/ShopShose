@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import axios from "axios";
+import { Link, useHistory } from "react-router-dom";
 
 const Order = () => {
+  const history = useHistory();
   const [orders, setOrders] = useState([
     {
       paymentId: 1,
@@ -18,6 +20,8 @@ const Order = () => {
     },
     // Thêm các đơn hàng khác nếu cần
   ]);
+
+  const [dataOrdersDB, setDataOrdersDB] = useState([]);
 
   const [checkData, setCheckData] = useState(true);
 
@@ -36,10 +40,69 @@ const Order = () => {
         config
       );
 
-      console.log(response.data);
+      console.log(response.data.metadata);
+      const sortData = response.data.metadata.sort(
+        (a, b) => b.order.id - a.order.id
+      );
+      setDataOrdersDB(sortData || []);
     };
     getData();
   }, []);
+
+  // Pagination
+  const itemsPerPage = 4;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const dataOrders = dataOrdersDB?.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(dataOrdersDB.length / itemsPerPage);
+
+  // console.log(dataOrders.length);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage + 1 <= totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handleBackPage = () => {
+    if (currentPage - 1 > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Pending,
+  // Confirmed,
+  // Shipped,
+  // Cancelled,
+  // Completed
+  const getStatus = (status) => {
+    switch (status) {
+      case 0:
+        return "Pending";
+      case 1:
+        return "Confirmed";
+      case 2:
+        return "Shipped";
+      case 3:
+        return "Cancelled";
+      case 4:
+        return "Completed";
+      default:
+        return "Pending";
+    }
+  };
+
+  const handleDetailOrder = (id) => {
+    // console.log("order", id);
+    history.push(`/detail-order/${id}`);
+  };
+
   return (
     <>
       <Header />
@@ -63,18 +126,22 @@ const Order = () => {
             </thead>
 
             <tbody>
-              {orders.map((order) => (
-                <tr key={order.paymentId} className="order-row">
-                  <td>{order.paymentId}</td>
-                  <td>{order.address}</td>
-                  <td>{order.status}</td>
-                  <td>{order.note}</td>
-                  <td>{order.paymentMethod}</td>
-                  <td>{order.phone}</td>
-                  <td>{order.total}</td>
-                  <td>{order.paymentMessage}</td>
-                  <td>{order.paymentContent}</td>
-                  <td>{order.paymentDestination}</td>
+              {dataOrders.map((item) => (
+                <tr
+                  onClick={() => handleDetailOrder(item.order.id)}
+                  key={item.order.id}
+                  className="order-row"
+                >
+                  <td>{item.order.id}</td>
+                  <td>{item.order.address}</td>
+                  <td>{getStatus(item.order.status)}</td>
+                  <td>{item.order.note}</td>
+                  <td>{item.order.payMethod}</td>
+                  <td>{item.order.phone}</td>
+                  <td>{item.order.total}</td>
+                  <td>{item.paymentMessage}</td>
+                  <td>{item.paymentContent}</td>
+                  <td>{item.paymentDes}</td>
                 </tr>
               ))}
             </tbody>
@@ -84,6 +151,46 @@ const Order = () => {
             No order
           </h3>
         )}
+
+        <div className="d-flex justify-content-center align-items-center mt-4">
+          {totalPages ? (
+            <>
+              <button
+                onClick={handleBackPage}
+                style={{ backgroundColor: "white" }}
+                className="border-0"
+              >
+                {"<"}
+              </button>
+
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  onClick={() => handlePageChange(index + 1)}
+                  key={index}
+                  style={{
+                    backgroundColor: "white",
+                    color: index + 1 === currentPage ? "blueviolet" : "gray",
+                    textDecoration:
+                      index + 1 === currentPage ? "underline" : "none",
+                  }}
+                  className="border-0"
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={handleNextPage}
+                style={{ backgroundColor: "white" }}
+                className="border-0"
+              >
+                {">"}
+              </button>
+            </>
+          ) : (
+            <></>
+          )}
+        </div>
       </div>
     </>
   );

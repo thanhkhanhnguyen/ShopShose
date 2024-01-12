@@ -1,27 +1,53 @@
 import moment from "moment";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header";
 import ProfileTabs from "../components/profileComponents/ProfileTabs";
 import { ListMyOrders } from "../redux/Actions/OrderActions";
 import { getUserDetails } from "../redux/Actions/UserActions";
 import Orders from "./../components/profileComponents/Orders";
+import axios from "axios";
 
 const ProfileScreen = () => {
   window.scrollTo(0, 0);
 
   const dispatch = useDispatch();
 
-  const userLogin = useSelector((state) => state.userLogin);
-  const { userInfo } = userLogin;
+  // const userLogin = useSelector((state) => state.userLogin);
+  // const { userInfo } = userLogin;
+
+  const userLogin = JSON.parse(localStorage.getItem("userInfo"));
 
   const orderListMy = useSelector((state) => state.orderListMy);
   const { loading, error, orders } = orderListMy;
+  // console.log(userLogin.metadata.accessToken);
+
+  const config = {
+    headers: {
+      Authorization: "Bearer " + String(userLogin.metadata.accessToken),
+    },
+  };
+
+  const [dataUser, setDataUser] = useState("");
 
   useEffect(() => {
-    dispatch(ListMyOrders());
-    dispatch(getUserDetails("profile"));
-  }, [dispatch]);
+    const getData = async () => {
+      const response = await axios.post(
+        "https://localhost:7296/api/User/profile",
+        {},
+        config
+      );
+
+      // console.log(response.data);
+      setDataUser(response.data);
+    };
+    getData();
+  }, []);
+
+  // useEffect(() => {
+  //   dispatch(ListMyOrders());
+  //   dispatch(getUserDetails("profile"));
+  // }, [dispatch]);
 
   return (
     <>
@@ -37,10 +63,10 @@ const ProfileScreen = () => {
                 </div>
                 <div className="author-card-details col-md-7">
                   <h5 className="author-card-name mb-2">
-                    <strong>{userInfo.name}</strong>
+                    <strong>{"name"}</strong>
                   </h5>
                   <span className="author-card-position">
-                    <>Joined {moment(userInfo.createdAt).format("LL")}</>
+                    <>Joined {moment("create").format("LL")}</>
                   </span>
                 </div>
               </div>
@@ -94,7 +120,7 @@ const ProfileScreen = () => {
               role="tabpanel"
               aria-labelledby="v-pills-home-tab"
             >
-              <ProfileTabs />
+              <ProfileTabs info={dataUser} />
             </div>
             <div
               className="tab-pane fade"
