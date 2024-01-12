@@ -14,3 +14,14 @@ export function parseOrderStatus(statusId) {
             return "Pending";
     }
 }
+
+export function parsePaymentMethod(methodId) {
+    switch (methodId) {
+        case 0:
+            return "Cash";
+        case 1:
+            return "Online";
+        default:
+            return "Cash";
+    }
+}

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 import Orders from "./Orders";
+import { parseOrderStatus } from "../../services/order-status";
 
 const OrderMain = (props) => {
   const { config } = props;
@@ -24,11 +25,11 @@ const OrderMain = (props) => {
   }, [])
   const [searchOrder, setSearchOrder] = useState("");
   const [statusList] = useState([
-    "Pending",
-    "Confirmed",
-    "Shipped",
-    "Cancelled",
-    "Completed",
+    0,
+    1,
+    2,
+    3,
+    4,
   ]);
   const [selectedStatus, setSelectedStatus] = useState();
   const [sortList] = useState([
@@ -41,10 +42,11 @@ const OrderMain = (props) => {
 
   // Search product
   const searchOrders = orders?.filter((order) => {
+    console.log(order);
     if (searchOrder === "") {
       return order;
     } else if (
-      order.user.name.toLowerCase().includes(searchOrder.toLowerCase())
+      order.user.fullName.toLowerCase().includes(searchOrder.toLowerCase())
     ) {
       return order;
     }
@@ -56,20 +58,11 @@ const OrderMain = (props) => {
   };
 
   const getFilterStatus = () => {
+    console.log(searchOrders);
     if (!selectedStatus) {
       return searchOrders;
-    } else if (selectedStatus === "Paid") {
-      return searchOrders?.filter((order) => order.isPaid === true);
-    } else if (selectedStatus === "Not Paid") {
-      return searchOrders?.filter((order) => order.isPaid === false);
-    } else if (selectedStatus === "Paid And Delivered") {
-      return searchOrders?.filter(
-        (order) => order.isPaid === true && order.isDelivered === true
-      );
-    } else if (selectedStatus === "Paid Not Yet Delivered") {
-      return searchOrders?.filter(
-        (order) => order.isPaid === true && order.isDelivered === false
-      );
+    } else {
+      return searchOrders?.filter((order) => order.order.status == selectedStatus);
     }
   };
 
@@ -132,7 +125,7 @@ const OrderMain = (props) => {
                 <option value="">Select a status</option>
                 {statusList.map((status) => (
                   <option value={status} key={status}>
-                    {status}
+                    {parseOrderStatus(status)}
                   </option>
                 ))}
               </select>
