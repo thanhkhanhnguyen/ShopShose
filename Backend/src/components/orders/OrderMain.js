@@ -130,20 +130,6 @@ const OrderMain = (props) => {
                 ))}
               </select>
             </div>
-            <div className="col-lg-2 col-6 col-md-3">
-              <select
-                name="orderSort"
-                className="form-select"
-                onChange={handleOrderSortChange}
-              >
-                <option value="">Select a sort</option>
-                {sortList.map((sort) => (
-                  <option value={sort} key={sort}>
-                    {sort}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
         </header>
         <div className="card-body">

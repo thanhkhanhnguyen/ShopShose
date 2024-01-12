@@ -242,7 +242,7 @@ const AddProductMain = (props) => {
                             className="mb-4 btn btn-outline-success"
                             htmlFor="previewImg"
                           >
-                            Chose Image <i className="fas fa-upload"></i>
+                            Choose Image <i className="fas fa-upload"></i>
                           </label>
                         </div>
                         <Message variant="alert-danger">{errorImage}</Message>
@@ -272,7 +272,7 @@ const AddProductMain = (props) => {
                             className="mb-4 btn btn-outline-success"
                             htmlFor="previewImg"
                           >
-                            Chose Image <i className="fas fa-upload"></i>
+                            Choose Image <i className="fas fa-upload"></i>
                           </label>
                         </div>
                         <Message variant="alert-info">
