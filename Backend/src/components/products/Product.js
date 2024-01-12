@@ -3,16 +3,30 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { deleteProduct } from "../../redux/Actions/ProductActions";
 import { deleteUploadImage } from "../../redux/Actions/UploadActions";
+import axios from "axios";
 
 const Product = (props) => {
   const { product } = props;
-
-  const dispatch = useDispatch();
-
-  const deleteHandler = (id, image) => {
-    if (window.confirm("Are you sure?")) {
-      dispatch(deleteProduct(id));
-      dispatch(deleteUploadImage(image));
+  const userLogin = JSON.parse(localStorage.getItem("userInfo"));
+  console.log('Bearer ' + String(userLogin.accessToken));
+  const config = {
+    headers: {
+      "Authorization": 'Bearer ' + String(userLogin.accessToken),
+    },
+  };
+  const deleteHandler = async (id) => {
+    try {
+      if (window.confirm("Are you sure?")) {
+      const response = await axios.post(`https://localhost:7296/delete/${id}`, {}, {
+        headers: {
+          "Content-Type": 'application/json',
+          "Authorization": 'Bearer ' + String(userLogin.accessToken),
+        },
+      });
+      alert(response.data);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -37,7 +51,7 @@ const Product = (props) => {
               </Link>
               <Link
                 to="#"
-                onClick={() => deleteHandler(product.id, product.image)}
+                onClick={() => deleteHandler(product.id)}
                 className="btn btn-sm btn-outline-danger p-2 pb-3 col-md-6"
               >
                 <i className="fas fa-trash-alt"></i>

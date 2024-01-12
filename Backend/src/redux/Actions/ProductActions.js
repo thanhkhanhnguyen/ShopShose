@@ -29,7 +29,7 @@ export const lisProducts = () => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.get("https://localhost:7296/api/Product", config);
+    const { data } = await axios.get("https://localhost:7296/api/Product?pageSize=1000", config);
     console.log(data);
     dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
   } catch (error) {
