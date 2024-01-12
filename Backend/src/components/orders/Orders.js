@@ -42,7 +42,7 @@ const Orders = (props) => {
               </td>
               <td>{moment(order.createdAt).format("MMM Do YY")}</td>
               <td>
-                  <span className="badge btn-success">{parseOrderStatus(order.payMethod)}</span>
+                  <span className="badge btn-success">{parseOrderStatus(order.status)}</span>
                   {/* <span className="badge btn-dark">Not Delivered</span> */}
               </td>
               <td className="d-flex justify-content-end align-item-center">

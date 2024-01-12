@@ -95,13 +95,13 @@ const OrderDetailmain = (props) => {
       console.log(selectedStatus);
       console.log(config);
       console.log(userLogin);
-      const response = await axios.patch("https://localhost:7296/api/Admin/status", {
-        orderId: orderId,
-        status: selectedStatus
+      const response = await axios.post("https://localhost:7296/api/Admin/status", {
+        orderId: parseInt(orderId),
+        status: parseInt(selectedStatus)
       }, {
         headers: {
-          "Authorization": 'Bearer ' + String(userLogin.accessToken),
           "Content-Type": 'application/json',
+          "Authorization": 'Bearer ' + String(userLogin.accessToken),
         },
       });
       alert(response.data.message);

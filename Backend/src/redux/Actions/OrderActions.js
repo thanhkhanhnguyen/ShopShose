@@ -18,13 +18,13 @@ export const listOrders = () => async (dispatch, getState) => {
     dispatch({ type: ORDER_LIST_REQUEST });
 
     const userInfo = localStorage.getItem("userInfo");
-
+    const userInfoParsed = JSON.parse(userInfo)
+   
     const config = {
       headers: {
-        "Authorization": 'Bearer ' + String(userInfo.accessToken),
+        "Authorization": 'Bearer ' + userInfoParsed.accessToken,
       },
     };
-
     const { data } = await axios.get("https://localhost:7296/api/Admin/orders", config);
 
     dispatch({ type: ORDER_LIST_SUCCESS, payload: data });

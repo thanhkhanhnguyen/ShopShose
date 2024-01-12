@@ -17,7 +17,7 @@ const OrderDetailScreen = ({ match }) => {
       <Sidebar />
       <main className="main-wrap">
         <Header />
-        <OrderDetailmain orderId={orderId} config={config}/>
+        <OrderDetailmain orderId={orderId} config={config} userLogin={userLogin}/>
       </main>
     </>
   );

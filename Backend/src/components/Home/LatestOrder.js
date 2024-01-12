@@ -13,6 +13,7 @@ const LatestOrder = (props) => {
     config
   ).then(response => {
     setOrders(response.data.metadata);
+    console.log(response.data.metadata);
   }).catch(error => {
     console.error(error)
   });
@@ -26,27 +27,44 @@ const LatestOrder = (props) => {
         <div className="table-responsive">
           <table className="table">
             <tbody>
+            <tr>
+            <th>Tên khách hàng</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái thanh toán</th>
+            <th>Phương thức thanh toán</th>
+            <th>Ngày thanh toán</th>
+            <th>Chi tiết</th>
+
+            </tr>
               {orders.map((order) => (
-                <tr key={order.id}>
+                <tr key={order.order.id}>
                   <td>
-                    <b>{order.user?.name}</b>
+                    <b>{order.user?.fullName}</b>
                   </td>
-                  <td>{order.user?.email}</td>
-                  <td>${order.total}</td>
+                  <td>${order.order.total}</td>
                   <td>
-                    {order.isPaid ? (
-                      <span className="badge rounded-pill alert-success">
-                        Paid At {moment(order.paidAt).format("MMM Do YY")}
+                      {order.payment?.paymentStatus == "00" ? (
+                        <span className="badge rounded-pill alert-success">
+                        {order.payment?.paymentLastMessage}
+                      </span>) : (
+                        <span className="badge rounded-pill alert-danger">
+                        Chưa thanh toán
                       </span>
-                    ) : (
-                      <span className="badge rounded-pill alert-danger">
-                        Not Paid
-                      </span>
-                    )}
+                      )}
                   </td>
-                  <td>{moment(order.createdAt).calendar()}</td>
+                  <td>
+                      {order.des?.id ? (
+                        <span className="badge rounded-pill alert-success">
+                        {order.des?.desShortName}
+                      </span>) : (
+                        <span className="badge rounded-pill alert-success">
+                        Tiền mặt
+                      </span>
+                      )}
+                  </td>
+                  <td>{moment(order.order.createdAt).calendar()}</td>
                   <td className="d-flex justify-content-end align-item-center">
-                    <Link to={`/order/${order.id}`} className="text-success">
+                    <Link to={`/order/${order.order.id}`} className="text-success">
                       <i className="fas fa-eye"></i>
                     </Link>
                   </td>

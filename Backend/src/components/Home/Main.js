@@ -7,7 +7,6 @@ import { useSelector } from "react-redux";
 
 const Main = () => {
   const userLogin = JSON.parse(localStorage.getItem("userInfo"));
-  console.log('Bearer ' + String(userLogin.accessToken));
   const config = {
     headers: {
       "Authorization": 'Bearer ' + String(userLogin.accessToken),
