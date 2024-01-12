@@ -19,6 +19,7 @@ import Log from "./screens/Log";
 import CheckOutSuccess from "./screens/CheckOutSuccess";
 import WaitOrder from "./screens/WaitOrder";
 import Order from "./screens/Orders";
+import DetailOrder from "./screens/DetailOrder";
 const App = () => {
   return (
     <Router>
@@ -35,6 +36,7 @@ const App = () => {
         <PrivateRouter path="/placeorder" component={PlaceOrderScreen} />
         <PrivateRouter path="/order/:id" component={OrderScreen} />
         <Route path="/orders" component={Order} />
+        <Route path="/detail-order/:id" component={DetailOrder} />
         <Route path="/check-out-success" component={CheckOutSuccess} />
         <Route path="/wait-order" component={WaitOrder} />
         <Route path="*" component={NotFound} />
