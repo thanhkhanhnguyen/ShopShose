@@ -23,16 +23,16 @@ const Orders = (props) => {
       <tbody>
         {sortOrders.length ? (
           sortOrders.map((order) => (
-            <tr key={order.id}>
+            <tr key={order.order.id}>
               <td>
-                <b>{order.userName}</b>
+                <b>{order.user.fullName}</b>
               </td>
-              <td>{order.email}</td>
-              <td>{order.total}</td>
+              <td>{order.user.email}</td>
+              <td>{order.order.total}</td>
               <td>
-                {order.isPaid ? (
+                {order.order.paymentId ? (
                   <span className="badge rounded-pill alert-success">
-                    Paid At {moment(order.paidAt).format("MMM Do YY")}
+                    Paid At {moment(order.payment.paymentDate).format("MMM Do YY")}
                   </span>
                 ) : (
                   <span className="badge rounded-pill alert-danger">
@@ -40,13 +40,13 @@ const Orders = (props) => {
                   </span>
                 )}
               </td>
-              <td>{moment(order.createdAt).format("MMM Do YY")}</td>
+              <td>{moment(order.order.createdAt).format("MMM Do YY")}</td>
               <td>
                   <span className="badge btn-success">{parseOrderStatus(order.status)}</span>
                   {/* <span className="badge btn-dark">Not Delivered</span> */}
               </td>
               <td className="d-flex justify-content-end align-item-center">
-                <Link to={`/order/${order.id}`} className="text-success">
+                <Link to={`/order/${order.order.id}`} className="text-success">
                   <i className="fas fa-eye"></i>
                 </Link>
               </td>

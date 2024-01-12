@@ -23,7 +23,6 @@ const OrderDetailmain = (props) => {
   const [order, setOrder] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const handleGetOrderDetail = async () => {
     try {
       const response = await axios.post(
@@ -32,6 +31,7 @@ const OrderDetailmain = (props) => {
         config
       );
       setOrder(response.data.metadata);
+      console.log(response.data.metadata);
       setLoading(false);
       handleOrderStatus(Number(response.data.metadata[0].order.status));
     } catch (error) {
@@ -163,13 +163,13 @@ const OrderDetailmain = (props) => {
               <div className="row">
                 <div className="col-lg-9">
                   <div className="table-responsive">
-                    <OrderDetailProducts order={order} />
+                    <OrderDetailProducts order={order}/>
                   </div>
                 </div>
                 {/* Payment Info */}
                 <div className="col-lg-3">
                   <div className="box shadow-sm bg-light">
-                    {order.isDelivered ? (
+                    {order[0].order.paymentId ? (
                       <button className="btn btn-success col-12">
                         DELIVERED AT ({" "}
                         {moment(order.deliveredAt).format("MMM Do YY")})
@@ -177,11 +177,11 @@ const OrderDetailmain = (props) => {
                     ) : (
                       <>
 
-                        <button
+                        <button disabled
                         
                           className="btn btn-dark col-12"
                         >
-                          MARK AS DELIVERED
+                          HAVE NOT BEEN DELIVERED YET
                         </button>
                       </>
                     )}

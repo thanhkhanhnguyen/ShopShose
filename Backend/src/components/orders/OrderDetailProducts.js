@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { parseOrderStatus } from "../../services/order-status";
 
 const OrderDetailProducts = (props) => {
   const { order } = props;
-  console.log(order.length);
-
+  const [total, setTotal] = useState(0);
+  useEffect(() => {
+    order.map((e) => {
+        setTotal(total + e.product.price * e.orderDetail.quantity);
+      })
+  }, [])
+  
   return (
     <table className="table border table-lg">
       <thead>
@@ -45,15 +50,15 @@ const OrderDetailProducts = (props) => {
           <td colSpan="4">
             <article className="float-end">
               <dl className="dlist">
-                <dt>Subtotal:</dt> <dd>${order[0].order.total}</dd>
+                <dt>Subtotal:</dt> <dd>${total}</dd>
               </dl>
               <dl className="dlist">
-                <dt>Shipping cost:</dt> <dd>$0</dd>
+                <dt>Shipping cost:</dt> <dd>${total * 0.05}</dd>
               </dl>
               <dl className="dlist">
                 <dt>Grand total:</dt>
                 <dd>
-                  <b className="h5">${order[0].order.total}</b>
+                  <b className="h5">${total * 1.05}</b>
                 </dd>
               </dl>
               

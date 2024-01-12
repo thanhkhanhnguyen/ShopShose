@@ -10,23 +10,23 @@ const CategoriesTable = (props) => {
   const categories = [
     {
       id: 1,
-      name: 'Category 1'
+      name: 'Thể Thao'
     },
     {
       id: 2,
-      name: 'Category 2'
+      name: 'Thời Trang'
     },
     {
       id: 3,
-      name: 'Category 3'
+      name: 'Chạy Bộ'
     },
     {
       id: 4,
-      name: 'Category 4'
+      name: 'Sandal'
     },
     {
       id: 5,
-      name: 'Category 5'
+      name: 'Dép'
     },
   ]
   const dispatch = useDispatch();

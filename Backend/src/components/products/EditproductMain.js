@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { lisCategories } from "../../redux/Actions/CategoryActions";
 import { editProduct, updateProduct } from "../../redux/Actions/ProductActions";
+import axios from "axios";
 import {
   deleteUploadImage,
   uploadImage,
@@ -22,20 +23,20 @@ const ToastObjects = {
 };
 
 const EditProductMain = (props) => {
-  const { productId } = props;
-
+  const { productId, config } = props;
+  const [product, setProduct] = useState(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [countInStock, setCountInStock] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [images, setImages] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const dispatch = useDispatch();
   const inputRef = useRef(null);
 
-  const productEdit = useSelector((state) => state.productEdit);
-  const { error, product } = productEdit;
 
   const productUpdate = useSelector((state) => state.productUpdate);
   const {
@@ -45,7 +46,7 @@ const EditProductMain = (props) => {
   } = productUpdate;
 
   const categoryList = useSelector((state) => state.categoryList);
-  const { loading: loadingList, error: errorList, categories } = categoryList;
+  const { loading: loadingList, error: errorList } = categoryList;
 
   const imageUpload = useSelector((state) => state.imageUpload);
   const { loading: loadingImage, error: errorImage, image } = imageUpload;
@@ -53,24 +54,33 @@ const EditProductMain = (props) => {
   const imageDelete = useSelector((state) => state.imageDelete);
   const { success: successDelete, error: errorDelete } = imageDelete;
 
-  useEffect(() => {
-    dispatch(lisCategories());
-    if (successProduct) {
-      dispatch({ type: PRODUCT_UPDATE_RESET });
-      toast.success("Product Updated", ToastObjects);
-    } else {
-      if (!product.name || product._id !== productId) {
-        dispatch(editProduct(productId));
-      } else {
-        setName(product.name);
-        setPrice(product.price);
-        setCountInStock(product.countInStock);
-        setDescription(product.description);
-        setCategory(product.category);
-        setImages(product.image);
-      }
+  
+
+  const handleGetProduct = async () => {
+    try {
+      const data = await axios.get(
+        `https://localhost:7296/${productId}`,
+        config
+      );
+      setProduct(data.data)
+      setName(data.data.name);
+      setPrice(data.data.price);
+      setCountInStock(data.data.quantity);
+      setDescription(data.data.description);
+      setCategory(data.data.categoryId);
+      setImages(data.data.image);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setError("Error fetching data from the API");
+      setLoading(false);
     }
-  }, [product, dispatch, productId, successProduct, successDelete]);
+  };
+
+  useEffect(() => {
+    handleGetProduct();
+    
+  }, [name]);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -122,20 +132,61 @@ const EditProductMain = (props) => {
     }
   };
 
-  const deleteUpload = async () => {
-    try {
-      dispatch(deleteUploadImage(image));
-      resetFileInput();
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const resetFileInput = () => {
-    inputRef.current.value = null;
-  };
 
   console.log(images);
+  const categories = [
+    {
+      id: 1,
+      name: 'Thể Thao'
+    },
+    {
+      id: 2,
+      name: 'Thời Trang'
+    },
+    {
+      id: 3,
+      name: 'Chạy Bộ'
+    },
+    {
+      id: 4,
+      name: 'Sandal'
+    },
+    {
+      id: 5,
+      name: 'Dép'
+    },
+  ]
+  const handleUpdateProduct = async () =>  {
+    try {
+      const response = await axios.put(
+      `https://localhost:7296/api/Product/UpdateProduct/${productId}`,
+      {
+        id: parseInt(productId),
+        name: name,
+        description: description,
+        price: parseInt(price),
+        quantity: parseInt(countInStock),
+        discount: 0,
+        categoryId: parseInt(category),
+        image: product.image,
+        rating: 0,
+      },
+      config
+    );
+    console.log(response);
+    alert(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+
+  }
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <Message variant="danger">{error}</Message>;
+  }
 
   return (
     <>
@@ -148,7 +199,7 @@ const EditProductMain = (props) => {
             </Link>
             <h2 className="content-title">Update Product</h2>
             <div>
-              <button type="submit" className="btn btn-primary">
+              <button type="submit" className="btn btn-primary" onClick={handleUpdateProduct}>
                 Publish now
               </button>
             </div>
@@ -158,14 +209,6 @@ const EditProductMain = (props) => {
             <div className="col-xl-8 col-lg-8">
               <div className="card mb-4 shadow-sm">
                 <div className="card-body">
-                  {errorUpdate && (
-                    <Message variant="alert-danger">{errorUpdate}</Message>
-                  )}
-                  {loadingUpdate ? (
-                    <Loading />
-                  ) : error ? (
-                    <Message variant="alert-danger">{error}</Message>
-                  ) : (
                     <>
                       <div className="mb-4">
                         <label htmlFor="product_title" className="form-label">
@@ -222,11 +265,7 @@ const EditProductMain = (props) => {
                       </div>
                       <div className="mb-4">
                         <label className="form-label">Categories</label>
-                        {loadingList ? (
-                          <Loading />
-                        ) : errorList ? (
-                          <Message variant="alert-danger">{errorList}</Message>
-                        ) : (
+                       
                           <select
                             name="category"
                             className="form-select"
@@ -236,91 +275,17 @@ const EditProductMain = (props) => {
                           >
                             <option value="">Select a category</option>
                             {categories.map((category) => (
-                              <option value={category._id} key={category._id}>
+                              <option value={category.id} key={category.id}>
                                 {category.name}
                               </option>
                             ))}
                           </select>
-                        )}
                       </div>
                     </>
-                  )}
                 </div>
               </div>
             </div>
-            <div className="col-xl-4 col-lg-4">
-              <div className="card mb-4 shadow-sm">
-                <div className="card-body">
-                  <div className="mb-4">
-                    <label className="form-label">Image</label>
-                    <input
-                      id="previewImg"
-                      className="form-control"
-                      type="file"
-                      ref={inputRef}
-                      onChange={handleUpload}
-                      hidden
-                    />
-                  </div>
-                  <div className="mb-4">
-                    {loadingImage ? (
-                      <Loading />
-                    ) : errorImage ? (
-                      <>
-                        <div className="d-grid gap-2">
-                          <label
-                            className="mb-4 btn btn-outline-success"
-                            htmlFor="previewImg"
-                          >
-                            Chose Image <i className="fas fa-upload"></i>
-                          </label>
-                        </div>
-                        <Message variant="alert-danger">{errorImage}</Message>
-                      </>
-                    ) : Object.keys(images).length !== 0 ? (
-                      <>
-                        <div
-                          className="mb-4 btn btn-danger"
-                          onClick={deleteUpload}
-                        >
-                          Delete image
-                        </div>
-                        <Img
-                          style={{
-                            width: "100%",
-                            height: "250px",
-                            background: "center center no-repeat",
-                            cursor: "pointer",
-                          }}
-                          src={images.url}
-                        />
-                        {errorDelete ? (
-                          <Message variant="alert-danger">
-                            {errorDelete}
-                          </Message>
-                        ) : (
-                          ""
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <div className="d-grid gap-2">
-                          <label
-                            className="mb-4 btn btn-outline-success"
-                            htmlFor="previewImg"
-                          >
-                            Chose Image <i className="fas fa-upload"></i>
-                          </label>
-                        </div>
-                        <Message variant="alert-info">
-                          No Image, please upload.
-                        </Message>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+           
           </div>
         </form>
       </section>

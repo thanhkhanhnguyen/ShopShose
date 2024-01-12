@@ -1,19 +1,46 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { listUser } from "../../redux/Actions/UserActions";
 import Loading from "../LoadingError/Loading";
 import Message from "../LoadingError/Error";
+import axios from "axios";
+import { error } from "jquery";
 
-const UserComponent = () => {
-  const dispatch = useDispatch();
-  const userList = useSelector((state) => state.userList);
-  const { loading, error, users } = userList;
+const UserComponent = (props) => {
+  const { config } = props;
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  const handleGetAllUser = async () => {
+    try {
+      const response = await axios.get("https://localhost:7296/api/Admin/users", config);
+      setUsers(response.data.metadata);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setError("Error fetching data from the API");
+      setLoading(false);
+    }
+  }
   useEffect(() => {
-    dispatch(listUser());
-  }, [dispatch]);
+    const fetchData = async () => {
+      // Gọi handleGetOrderDetail
+      await handleGetAllUser();
+    };
+  
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <Message variant="danger">{error}</Message>;
+  }
 
   return (
     <section className="content-main">
@@ -44,42 +71,29 @@ const UserComponent = () => {
                 <option>Show all</option>
               </select>
             </div>
-            <div className="col-lg-2 col-6 col-md-3">
-              <select className="form-select">
-                <option>Status: all</option>
-                <option>Active only</option>
-                <option>Disabled</option>
-              </select>
-            </div>
+
           </div>
         </header>
 
         {/* Card */}
         <div className="card-body">
-          {loading ? (
-            <Loading />
-          ) : error ? (
-            <Message variant="alert-danger">{error}</Message>
-          ) : (
             <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
               {users.map((user) => (
-                <div className="col" key={user._id}>
+                <div className="col" key={user.id}>
                   <div className="card card-user shadow-sm">
                     <div className="card-header">
                       <img
                         className="img-md img-avatar"
-                        src="images/favicon.png"
+                        src="https://png.pngtree.com/png-vector/20190623/ourlarge/pngtree-accountavataruser--flat-color-icon--vector-icon-banner-templ-png-image_1491720.jpg"
                         alt="User pic"
                       />
                     </div>
                     <div className="card-body">
-                      <h5 className="card-title mt-5">{user.name}</h5>
+                      <h5 className="card-title mt-5">{user.fullName}</h5>
                       <div className="card-text text-muted">
-                        {user.isAdmin === true ? (
-                          <p className="m-0">Admin</p>
-                        ) : (
-                          <p className="m-0">Customer</p>
-                        )}
+                          <p className="m-0">{ user.phone }</p>
+                          <p className="m-0">{ user.address }</p>
+                        
 
                         <p>
                           <a href={`mailto:${user.email}`}>{user.email}</a>
@@ -90,7 +104,6 @@ const UserComponent = () => {
                 </div>
               ))}
             </div>
-          )}
 
           {/* nav */}
           <nav className="float-end mt-4" aria-label="Page navigation">
