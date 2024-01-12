@@ -20,7 +20,7 @@ const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
   pauseOnHover: false,
-  autoClose: 3000,
+  autoClose: 2000,
 };
 
 function getCurrentDateFormatted() {
@@ -96,15 +96,6 @@ const SingleProduct = ({ history, match }) => {
     setAverageRating(Math.round(average));
   }, [productId, submitHandler]);
 
-  // useEffect(() => {
-  //   const fetchDT = async () => {
-  //     const rs = await axios.get(`https://localhost:7296/1`);
-  //     console.log("fetchData", rs);
-  //   };
-
-  //   fetchDT();
-  // }, []);
-
   useEffect(() => {
     if (successCreateReview) {
       toast.success("Review Submitted", ToastObjects);
@@ -115,60 +106,47 @@ const SingleProduct = ({ history, match }) => {
     dispatch(listProductDetails(productId));
   }, [dispatch, productId, successCreateReview]);
 
-  // const AddToCartHandle = (e) => {
-  //   e.preventDefault();
-  //   history.push(`/cart/${productId}?qty=${qty}`);
-  // };
-
-  // //handle add to cart into session storage
-  // const addToCart = (item) => {
-  //   const { id, name, price } = item;
-  //   const updatedCart = {
-  //     id,
-  //     name,
-  //     price,
-  //     inQuantity,
-  //   };
-  //   setCart(updatedCart);
-  //   sessionStorage.setItem("cart", JSON.stringify(updatedCart));
-  // };
-
   // add to cart
   const addToCart = async (item) => {
     // Gửi action addToCart với productId và quantity
     const userLogin = JSON.parse(localStorage.getItem("userInfo"));
-    const config = {
-      headers: {
-        Authorization: "Bearer " + String(userLogin.metadata.accessToken),
-      },
-    };
-    try {
-      const { id } = item;
-      const data = {
-        productId: id,
-        quantity: inQuantity * 1,
+    if (!userLogin) {
+      alert("You must login to checkout");
+    }
+    if (userLogin) {
+      const config = {
+        headers: {
+          Authorization: "Bearer " + String(userLogin.metadata.accessToken),
+        },
       };
+      try {
+        const { id } = item;
+        const data = {
+          productId: id,
+          quantity: inQuantity * 1,
+        };
 
-      const response = await axios.post(
-        "https://localhost:7296/api/Cart/add",
-        data,
-        config
-      );
+        const response = await axios.post(
+          "https://localhost:7296/api/Cart/add",
+          data,
+          config
+        );
 
-      const response2 = await axios.get(
-        "https://localhost:7296/api/Cart",
-        config
-      );
-      dispatch({ type: "UPDATE_NUM_CART", payload: response2.data.length });
-      // sessionStorage.setItem("numCart", JSON.stringify(response2.data.length));
+        const response2 = await axios.get(
+          "https://localhost:7296/api/Cart",
+          config
+        );
+        dispatch({ type: "UPDATE_NUM_CART", payload: response2.data.length });
+        // sessionStorage.setItem("numCart", JSON.stringify(response2.data.length));
 
-      toast.success("Add to cart successfully", ToastObjects);
+        toast.success("Add to cart successfully", ToastObjects);
 
-      // Xử lý kết quả response tại đây nếu cần
-      console.log(response.data);
-    } catch (error) {
-      // Xử lý lỗi tại đây
-      console.error("Error adding to cart:", error);
+        // Xử lý kết quả response tại đây nếu cần
+        console.log(response.data);
+      } catch (error) {
+        // Xử lý lỗi tại đây
+        console.error("Error adding to cart:", error);
+      }
     }
   };
 

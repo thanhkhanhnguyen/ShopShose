@@ -28,14 +28,19 @@ export const login = (email, password) => async (dispatch) => {
       },
     };
 
-    const { data } = await axios.post(
-      `https://localhost:7296/api/Auth/login`,
-      { email, password },
-      config
-    );
-    dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
+    try {
+      const { data } = await axios.post(
+        `https://localhost:7296/api/Auth/login`,
+        { email, password },
+        config
+      );
+      dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
 
-    localStorage.setItem("userInfo", JSON.stringify(data));
+      localStorage.setItem("userInfo", JSON.stringify(data));
+    } catch (error) {
+      alert("account or password is incorrect");
+      window.location.reload();
+    }
   } catch (error) {
     dispatch({
       type: USER_LOGIN_FAIL,
@@ -68,12 +73,6 @@ export const register = (name, email, password, phone) => async (dispatch) => {
         "Content-Type": "application/json",
       },
     };
-
-    // const { data } = await axios.post(
-    //   `/api/users`,
-    //   { name, email, password },
-    //   config
-    // );
 
     const { data } = await axios.post(
       `https://localhost:7296/api/Auth/register`,
