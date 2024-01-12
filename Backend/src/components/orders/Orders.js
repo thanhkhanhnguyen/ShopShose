@@ -40,7 +40,7 @@ const Orders = (props) => {
                   </span>
                 )}
               </td>
-              <td>{moment(order.order.createdAt).format("MMM Do YY")}</td>
+              <td>{order?.order?.createdAt ? moment(order.order.createdAt).format("MMM Do YY") : moment().format("MMM Do YY")}</td>
               <td>
                   <span className="badge btn-success">{parseOrderStatus(order.order.status)}</span>
                   {/* <span className="badge btn-dark">Not Delivered</span> */}
